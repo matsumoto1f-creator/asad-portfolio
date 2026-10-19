@@ -6,3 +6,4 @@ voicemap/
 .DS_Store
 *.env
 .env*
+CLAUDE.md
