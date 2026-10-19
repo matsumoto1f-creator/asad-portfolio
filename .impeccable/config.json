@@ -20,6 +20,42 @@
         ],
         "createdAt": "2026-10-19T02:10:57.980Z",
         "reason": "Claude: false positive, regex fallback skips clamp() sizes; real scale runs 11px mono to clamp(64px,13.5vw,250px) display"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "dealer/index.html"
+        ],
+        "createdAt": "2026-10-19T03:35:29.713Z",
+        "reason": "Asad (user confirmed 2026-10-18): leave as is, DealerOn already has the links"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "maison/index.html"
+        ],
+        "createdAt": "2026-10-19T03:35:29.756Z",
+        "reason": "Asad (user confirmed 2026-10-18): leave as is, DealerOn already has the links"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-19T03:35:29.801Z",
+        "reason": "Asad (user confirmed 2026-10-18): leave as is, DealerOn already has the links"
+      },
+      {
+        "rule": "marquee",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-19T03:35:29.846Z",
+        "reason": "Asad (user confirmed 2026-10-18): leave as is, DealerOn already has the links"
       }
     ]
   }
