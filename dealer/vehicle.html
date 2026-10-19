@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230c1a2b%22/%3E%3Ctext x=%2216%22 y=%2221%22 font-size=%2213%22 text-anchor=%22middle%22 fill=%22%23d8a531%22 font-family=%22Arial%22 font-weight=%22700%22%3EHC%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="dealer.css">
 </head>
 <body data-page="vdp">
@@ -26,8 +27,8 @@
       <section class="vdp-sec"><h2>Warranty</h2><p>New Chevrolet vehicles include the factory bumper-to-bumper and powertrain limited warranties. Certified Pre-Owned vehicles add the remaining factory coverage plus certified powertrain coverage. Ask us for the terms on this exact vehicle.</p></section>
     </div>
     <div class="col-md-5"><div class="side"><div class="box">
-      <div id="vStack"></div><div class="fin" id="vFin"></div>
-      <div class="stack-btns"><button class="btn btn-cta btn-lg" data-lead="Confirm availability" data-stock-fill>Confirm Availability</button>
+      <div id="vStack"></div><div class="pay2" style="border-top:0;margin-top:4px;padding-top:0"><span class="fine-print" style="margin:0">Your estimate</span><div class="mo">Est. <b id="vMo"></b><button type="button" data-terms>Adjust terms</button></div></div><div class="fin" id="vFin"></div><div class="hist" id="vHist"></div>
+      <div class="stack-btns"><button class="btn btn-cta btn-lg" data-lead="Confirm availability" data-stock-fill>Confirm Availability</button><button class="btn btn-dark" data-lead="Reserve it online ($500, fully refundable)" data-stock-fill>Reserve online · $500 refundable</button>
         <div class="row2"><button class="btn btn-line" data-lead="Get ePrice" data-stock-fill>Get ePrice</button><button class="btn btn-line" data-lead="Value your trade" data-stock-fill>Value Your Trade</button></div>
         <div class="row2"><button class="btn btn-line" data-lead="Schedule a test drive" data-stock-fill>Test Drive</button><button class="btn btn-line" data-lead="Request the window sticker" data-stock-fill>Window Sticker</button></div></div>
       <p class="fine-print">Prices exclude tax, title, license and registration. Incentives expire 11/02/2026. See dealer for complete details.</p></div>
@@ -44,6 +45,7 @@
   <section class="vdp-sec"><h2>Similar vehicles</h2><div class="grid-cards" id="similar"></div></section>
 </div>
 </main>
+<div class="mobar" aria-label="Price summary"><div><b></b><small></small></div><button class="btn btn-cta" data-lead="Confirm availability" data-stock-fill>Check availability</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script src="inventory.js"></script>
