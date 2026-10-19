@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Halcyon Chevrolet · New &amp; Used Chevy Dealer in Somerset, NJ (Concept)</title>
+<meta name="description" content="Concept dealership website built on the DealerOn stack (Bootstrap 3.4 + jQuery 3.7): hero carousel, quick search, specials, model bar and service offers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="dealer.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"AutoDealer","name":"Halcyon Chevrolet (concept)","address":{"@type":"PostalAddress","streetAddress":"1 Halcyon Way","addressLocality":"Somerset","addressRegion":"NJ","postalCode":"08873","addressCountry":"US"},"telephone":"+1-555-010-0199","openingHours":["Mo-Fr 09:00-20:00","Sa 09:00-18:00"]}</script>
+</head>
+<body data-page="home">
+<main id="main">
+  <!-- 1650x138 promo strip. data-expires removes it automatically after the offer ends -->
+  <a class="strip" href="specials.html#service" data-expires="2026-11-02"><span class="in"><b>Fall Service Event</b><span>Full synthetic oil change + tire rotation</span><em>$79.95 · ends 11/02</em></span></a>
+
+  <!-- 1920x600 hero, Bootstrap 3 carousel with fade -->
+  <div id="hero" class="carousel slide carousel-fade hero" data-ride="false" aria-roledescription="carousel" aria-label="Featured offers">
+    <ol class="carousel-indicators"><li data-target="#hero" data-slide-to="0" class="active" aria-label="Slide 1"></li><li data-target="#hero" data-slide-to="1" aria-label="Slide 2"></li><li data-target="#hero" data-slide-to="2" aria-label="Slide 3"></li></ol>
+    <div class="carousel-inner">
+      <div class="item active"><div class="slide">
+        <picture><source media="(max-width:768px)" srcset="../img/inv/corvette-blue.webp"><img src="../img/inv/corvette-blue.webp" alt="Rapid Blue Chevrolet Corvette Stingray" fetchpriority="high"></picture>
+        <div class="scrim"></div><div class="cap"><div class="container"><span class="k">Just arrived</span><h2>2026 Corvette Stingray</h2><p>Two in stock, Rapid Blue coupe and Torch Red convertible. Book a drive before they’re spoken for.</p><a class="btn btn-cta" href="inventory.html?model=Corvette">Shop Corvette (2)</a></div></div></div></div>
+      <div class="item"><div class="slide">
+        <picture><source media="(max-width:768px)" srcset="../img/inv/silverado.webp"><img src="../img/inv/silverado.webp" alt="Chevrolet Silverado 1500 LT Trail Boss" loading="lazy"></picture>
+        <div class="scrim"></div><div class="cap"><div class="container"><span class="k">Fall Truck Event</span><h2>$4,700 off Silverado 1500 Trail Boss</h2><p>$3,200 Halcyon discount plus $1,500 Customer Cash on stock HC26-1142.</p><a class="btn btn-cta" href="vehicle.html?stock=HC26-1142">See this truck</a><p class="fine">MSRP $63,995. Halcyon Price $59,844 includes $549 doc fee; excludes tax, title, license, registration. Customer Cash requires retail delivery by 11/02/2026.</p></div></div></div></div>
+      <div class="item"><div class="slide">
+        <picture><source media="(max-width:768px)" srcset="../img/cars/zl1-hero.webp"><img src="../img/cars/zl1-hero.webp" alt="White Camaro ZL1 in a dark garage" loading="lazy"></picture>
+        <div class="scrim"></div><div class="cap"><div class="container"><span class="k">Certified Pre-Owned</span><h2>The last of the ZL1s</h2><p>One owner, 8,412 miles, 650 horsepower. Production ended in 2024; this one is here.</p><a class="btn btn-cta" href="../zl1/">See the ZL1 story</a></div></div></div></div>
+    </div>
+    <a class="left carousel-control" href="#hero" role="button" data-slide="prev" aria-label="Previous slide"><span aria-hidden="true">‹</span></a>
+    <a class="right carousel-control" href="#hero" role="button" data-slide="next" aria-label="Next slide"><span aria-hidden="true">›</span></a>
+    <button class="pausebtn" id="heroPause" aria-pressed="false">Pause</button>
+  </div>
+
+  <!-- quick search: Vehicle / Keyword / Budget -->
+  <div class="container qs"><div class="box">
+    <ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#qsV" role="tab" data-toggle="tab" aria-controls="qsV">Vehicle</a></li><li role="presentation"><a href="#qsK" role="tab" data-toggle="tab" aria-controls="qsK">Keyword</a></li><li role="presentation"><a href="#qsB" role="tab" data-toggle="tab" aria-controls="qsB">Budget</a></li></ul>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="qsV"><div class="row">
+        <div class="col-md-3 col-sm-6"><label>Condition</label><div class="cond" role="group" aria-label="Condition"><button type="button" data-c="New" aria-pressed="true">New</button><button type="button" data-c="Used" aria-pressed="false">Used</button><button type="button" data-c="Certified" aria-pressed="false">CPO</button></div></div>
+        <div class="col-md-3 col-sm-6"><label for="qsModel">Model</label><select class="form-control" id="qsModel"></select></div>
+        <div class="col-md-2 col-sm-6"><label for="qsMax">Max price</label><select class="form-control" id="qsMax"><option value="">No max</option><option value="30000">$30,000</option><option value="50000">$50,000</option><option value="70000">$70,000</option><option value="90000">$90,000</option></select></div>
+        <div class="col-md-2 col-sm-3 col-xs-6"><label>&nbsp;</label><button class="btn btn-cta" id="qsGo">Search</button></div>
+        <div class="col-md-2 col-sm-3 col-xs-6"><label>&nbsp;</label><button class="btn btn-line" id="qsReset">Reset</button></div>
+      </div><p class="count"><b>0</b> vehicles match</p></div>
+      <div role="tabpanel" class="tab-pane" id="qsK"><div class="row"><div class="col-sm-9"><label for="kw">Keyword</label><input class="form-control" id="kw" placeholder="Try “Z71”, “red”, “sunroof” or a stock number"></div><div class="col-sm-3"><label>&nbsp;</label><button class="btn btn-cta" id="kwGo">Search</button></div></div></div>
+      <div role="tabpanel" class="tab-pane" id="qsB"><div class="row"><div class="col-sm-4"><label for="bdPay">Monthly payment</label><input class="form-control" id="bdPay" inputmode="numeric" value="650"></div><div class="col-sm-4"><label for="bdDown">Down payment</label><input class="form-control" id="bdDown" inputmode="numeric" value="5000"></div><div class="col-sm-4"><label>&nbsp;</label><button class="btn btn-cta" id="bdGo">Show what fits</button></div></div><p class="count">Estimate at 6.9% APR for 72 months. Not an offer of credit.</p></div>
+    </div>
+  </div></div>
+
+  <!-- 600x400 specials tiles: designed graphics, every word is real HTML -->
+  <section class="sec" aria-labelledby="spH"><div class="container">
+    <div class="hd"><div><span class="eyebrow">This month</span><h2 id="spH">Current specials</h2></div><a class="btn btn-line" href="specials.html">All specials →</a></div>
+    <div class="row">
+      <div class="col-md-4 col-sm-6" style="margin-bottom:20px"><a class="tile" href="specials.html"><img src="../img/inv/equinox.webp" alt="" loading="lazy"><span class="exp">Ends 11/02</span><span class="t"><span class="m">Lease a 2026 Equinox LT</span><span class="big">$329<small>/mo</small></span><span class="sub">36 months · $3,999 due at signing</span><span class="fine">Stk HC26-1203, MSRP $32,595. 10k mi/yr. With approved credit through GM Financial. Tax, title, license extra. See terms.</span></span></a></div>
+      <div class="col-md-4 col-sm-6" style="margin-bottom:20px"><a class="tile t2" href="vehicle.html?stock=HC26-1142"><img src="../img/inv/silverado.webp" alt="" loading="lazy"><span class="exp">Ends 11/02</span><span class="t"><span class="m">2026 Silverado 1500 Trail Boss</span><span class="big">$4,700<small> off</small></span><span class="sub">Discount + Customer Cash</span><span class="fine">Stk HC26-1142, MSRP $63,995. Halcyon Price $59,844 incl. $549 doc fee. Retail delivery by 11/02/2026.</span></span></a></div>
+      <div class="col-md-4 col-sm-6" style="margin-bottom:20px"><a class="tile t3" href="vehicle.html?stock=HC25-0931"><img src="../img/inv/tahoe-z71.webp" alt="" loading="lazy"><span class="exp">Last 2025</span><span class="t"><span class="m">2025 Tahoe Z71 · year-end</span><span class="big">$6,100<small> off</small></span><span class="sub">Last 2025 Tahoe on the lot</span><span class="fine">Stk HC25-0931, MSRP $74,395. Includes $2,000 Model Year-End Cash. Halcyon Price $68,844 incl. doc fee.</span></span></a></div>
+    </div>
+  </div></section>
+
+  <section class="sec gray" aria-labelledby="mbH"><div class="container">
+    <div class="hd"><div><span class="eyebrow">Shop by model</span><h2 id="mbH">The lineup</h2></div></div>
+    <div class="models" id="models"></div>
+  </div></section>
+
+  <!-- 1920x450 service band -->
+  <section class="band" aria-labelledby="bandH"><div class="container">
+    <div><span class="eyebrow" style="color:var(--gold)">Service &amp; Parts</span><h2 id="bandH">Winter-ready<br><em>inspection, on us.</em></h2><p>Battery test, tires, brakes, wipers and coolant, 27 points in all. Free with any oil change through 11/02. Certified technicians, genuine parts.</p><button class="btn btn-cta" data-lead="Schedule service">Schedule service</button></div>
+    <div class="coupon"><b>$0</b><span>27-point check with any oil change</span></div>
+  </div></section>
+
+  <section class="sec" aria-label="Shopping tools"><div class="container"><div class="value">
+    <a href="#" data-lead="Get pre-approved"><span class="ic" aria-hidden="true">✓</span><span><b>Get pre-approved</b><span>Soft pull, no effect on your score.</span></span></a>
+    <a href="#" data-lead="Value your trade"><span class="ic" aria-hidden="true">$</span><span><b>Value your trade</b><span>A real number in about a minute.</span></span></a>
+    <a href="#" data-lead="Schedule service"><span class="ic" aria-hidden="true">⚙</span><span><b>Schedule service</b><span>Saturday appointments available.</span></span></a>
+  </div></div></section>
+
+  <section class="sec gray" id="visit" aria-labelledby="visitH"><div class="container"><div class="visit">
+    <div><span class="eyebrow">Visit us</span><h2 id="visitH" style="font-size:38px;text-transform:uppercase;margin:6px 0 12px">Halcyon Chevrolet</h2><p>1 Halcyon Way<br>Somerset, NJ 08873</p><p>Sales <a href="tel:5550100199">(555) 010-0199</a><br>Service <a href="tel:5550100142">(555) 010-0142</a></p><a class="btn btn-dark" href="#" data-lead="Get directions">Get directions</a></div>
+    <div><h3 style="text-transform:uppercase;margin-top:0">Sales hours</h3><table><tbody><tr><td>Mon–Fri</td><td>9:00 AM – 8:00 PM</td></tr><tr><td>Saturday</td><td>9:00 AM – 6:00 PM</td></tr><tr><td>Sunday</td><td>Closed</td></tr></tbody></table><h3 style="text-transform:uppercase">Service hours</h3><table><tbody><tr><td>Mon–Fri</td><td>7:00 AM – 6:00 PM</td></tr><tr><td>Saturday</td><td>8:00 AM – 3:00 PM</td></tr></tbody></table></div>
+    <div class="map" role="img" aria-label="Stylised map showing the dealership location"><svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#dfe6ee"/><g stroke="#fff" stroke-width="10" fill="none"><path d="M-10 190 C80 170 160 200 230 150 S360 90 420 110"/><path d="M120 -10 L150 270"/><path d="M-10 70 L420 40"/></g><g stroke="#f2c14e" stroke-width="12" fill="none"><path d="M260 -10 C250 80 280 160 250 270"/></g><path d="M200 120 c-14 0-24 10-24 24 0 18 24 42 24 42s24-24 24-42c0-14-10-24-24-24z" fill="#c8102e"/><circle cx="200" cy="144" r="8" fill="#fff"/></svg></div>
+  </div></div></section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="inventory.js"></script>
+<script src="dealer.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+FACTS.md
+research/
+_picks/
+_picks2/
+voicemap/
+.DS_Store
+*.env
+.env*

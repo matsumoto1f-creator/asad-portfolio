@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurélia High Jewellery — Concept by Asad Matsumoto</title>
+<meta name="description" content="Fictional high-jewellery house. A WebGL diamond that is cut, turned and set as you scroll.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/shared.css">
+<style>
+:root{--bg:#06080c;--ink:#f3efe6;--accent:#d8b36a;--mut:#8b93a1;--serif:'Bodoni Moda',Georgia,serif;--sans:'Jost',system-ui,sans-serif}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300}
+#gl{position:fixed;inset:0;z-index:1;pointer-events:none}
+#spark{position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:screen}
+.glow{position:fixed;inset:0;z-index:0;background:radial-gradient(60% 50% at 50% 50%,rgba(216,179,106,.16),transparent 70%);opacity:.8;pointer-events:none}
+section,header,footer,nav{position:relative;z-index:5}
+.nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:26px 4vw;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+.nav b{font:400 20px var(--serif);letter-spacing:.3em;color:var(--accent)}
+.nav ul{display:flex;gap:32px;list-style:none;color:var(--mut)}
+@media(max-width:700px){.nav ul{display:none}}
+.scene{height:100vh;display:grid;place-items:center;padding:0 6vw;text-align:center;position:relative}
+.scene h1,.scene h2{font:400 clamp(44px,9vw,150px)/.92 var(--serif);letter-spacing:-.02em}
+.scene h1 em,.scene h2 em{font-style:italic;color:var(--accent)}
+.scene p{max-width:42ch;margin:3vh auto 0;color:var(--mut);line-height:1.8;font-size:15px}
+.k{font-size:11px;letter-spacing:.36em;text-transform:uppercase;color:var(--accent);margin-bottom:3vh;display:block}
+.left{place-items:center start;text-align:left}.right{place-items:center end;text-align:left}
+.left>div,.right>div{max-width:min(520px,42vw)}
+@media(max-width:800px){.left>div,.right>div{max-width:100%;align-self:end;padding-bottom:10vh}.left,.right{place-items:end center}}
+.scene .stat{display:flex;gap:6vw;margin-top:6vh;justify-content:inherit}
+.stat div{font:400 clamp(34px,4vw,60px) var(--serif);color:var(--ink)}
+.stat small{display:block;font:300 10px var(--sans);letter-spacing:.3em;text-transform:uppercase;color:var(--mut);margin-top:6px}
+.tall{height:420vh;position:relative}
+.tall .sticky{position:sticky;top:0;height:100vh;display:grid;place-items:center}
+.tall .step{position:absolute;left:6vw;right:6vw;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none}
+.tall .step.r{text-align:right}
+.tall .step h3{font:400 clamp(34px,5.4vw,90px)/.95 var(--serif)}
+.tall .step h3 em{color:var(--accent);font-style:italic}
+.tall .step p{max-width:34ch;color:var(--mut);line-height:1.8;margin-top:2.5vh;font-size:15px}
+.tall .step.r p{margin-left:auto}
+.tall .step .k{margin-bottom:2vh}
+.ring{width:min(70vmin,560px);aspect-ratio:1;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0}
+.ring svg{width:100%;height:100%}
+.col{padding:20vh 4vw;display:grid;grid-template-columns:repeat(3,1fr);gap:2vw}
+.col a{position:relative;aspect-ratio:3/4;border:1px solid rgba(243,239,230,.12);display:flex;align-items:flex-end;padding:22px;overflow:hidden;background:#0a0e14;transition:border-color .5s}
+.col a:hover{border-color:var(--accent)}
+.col a svg{position:absolute;inset:0;width:100%;height:100%;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.col a:hover svg{transform:scale(1.08)}
+.col a div{position:relative;font:400 28px var(--serif)}
+.col a small{display:block;font:300 11px var(--sans);letter-spacing:.26em;color:var(--accent);margin-top:8px}
+@media(max-width:800px){.col{grid-template-columns:1fr}}
+footer{padding:20vh 4vw 12vh;text-align:center;background:linear-gradient(transparent,rgba(6,8,12,.9) 30%)}
+footer h2{font:400 clamp(44px,10vw,170px)/.9 var(--serif)}footer h2 em{color:var(--accent)}
+footer .f{margin-top:12vh;display:flex;justify-content:space-between;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut);flex-wrap:wrap;gap:12px}
+.fallback{display:none}
+.nogl .fallback{display:block;position:fixed;left:50%;top:50%;width:min(60vmin,480px);transform:translate(-50%,-50%);z-index:1;opacity:.9}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="curs"></div>
+<div class="glow"></div><canvas id="gl"></canvas><canvas id="spark"></canvas>
+<svg class="fallback" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#8fb2ff"/></linearGradient></defs><polygon points="100,20 170,70 100,185 30,70" fill="url(#fg)" opacity=".85"/><polygon points="100,20 130,70 100,185 70,70" fill="#fff" opacity=".45"/><polygon points="30,70 170,70 100,40" fill="#fff" opacity=".35"/></svg>
+
+<nav class="nav"><b>AURÉLIA</b><ul><li>High Jewellery</li><li>Maison</li><li>Appointments</li></ul></nav>
+
+<header class="scene"><div><span class="k" data-reveal>Haute Joaillerie — Collection Nº 9</span><h1 data-split>One stone.<br><em>Four hundred</em> hours.</h1><p data-reveal data-delay=".3">A 12.41-carat D-colour diamond, cut over eleven months and set in platinum by three people. Scroll to watch it made.</p></div></header>
+
+<section class="scene left"><div><span class="k" data-reveal>I — The Rough</span><h2 data-split>Found at <em>3,000 m.</em></h2><p data-reveal>Every stone begins as a decision: what to keep and what to give up. We spend three months before the first cut.</p>
+<div class="stat" data-reveal><div>12.41<small>Carats</small></div><div>D · IF<small>Colour · Clarity</small></div></div></div></section>
+
+<section class="tall" id="tall"><div class="sticky">
+<div class="step" data-i="0"><span class="k">II — The Cut</span><h3>Fifty-seven <em>facets,</em><br>each one argued over.</h3><p>Light enters, finds its way home, and leaves as fire. We cut to the angle that returns the most of it.</p></div>
+<div class="step r" data-i="1"><span class="k">III — The Turn</span><h3>It is <em>never</em><br>the same stone twice.</h3><p>Turn it a degree and the whole character changes. We check every one of three hundred and sixty.</p></div>
+<div class="step" data-i="2"><span class="k">IV — The Setting</span><h3>Platinum, <em>invisible</em><br>until it matters.</h3><p>Six claws, each filed under magnification until the stone appears to float above the hand.</p></div>
+<div class="ring" id="ring"><svg viewBox="0 0 400 400"><defs><linearGradient id="pl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6f4ee"/><stop offset=".5" stop-color="#9aa1ab"/><stop offset="1" stop-color="#e8e5de"/></linearGradient></defs><circle cx="200" cy="248" r="112" fill="none" stroke="url(#pl)" stroke-width="14"/><circle cx="200" cy="248" r="98" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="2"/><g stroke="url(#pl)" stroke-width="7" stroke-linecap="round" fill="none"><path d="M168 150l-10-30"/><path d="M232 150l10-30"/><path d="M200 140v-34"/></g></svg></div>
+</div></section>
+
+<section class="scene"><div><span class="k" data-reveal>The Collection</span><h2 data-split>Eleven pieces. <em>No repeats.</em></h2></div></section>
+
+<section class="col">
+<a href="#" data-cursor><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="c1" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#d8b36a" stop-opacity=".4"/><stop offset="1" stop-opacity="0"/></radialGradient></defs><rect width="300" height="400" fill="url(#c1)"/><circle cx="150" cy="190" r="70" fill="none" stroke="#d8b36a" stroke-width="2"/><circle cx="150" cy="120" r="14" fill="#fff" opacity=".9"/></svg><div>Étoile Solitaire<small>PLATINUM · 12.41 CT</small></div></a>
+<a href="#" data-cursor><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="c2" cx=".5" cy=".3" r=".7"><stop offset="0" stop-color="#7fb2c9" stop-opacity=".4"/><stop offset="1" stop-opacity="0"/></radialGradient></defs><rect width="300" height="400" fill="url(#c2)"/><path d="M50 110c60 120 140 120 200 0" fill="none" stroke="#d8b36a" stroke-width="2"/><g fill="#fff"><circle cx="60" cy="128" r="6"/><circle cx="90" cy="168" r="8"/><circle cx="125" cy="192" r="10"/><circle cx="150" cy="198" r="12"/><circle cx="175" cy="192" r="10"/><circle cx="210" cy="168" r="8"/><circle cx="240" cy="128" r="6"/></g></svg><div>Rivière Nocturne<small>WHITE GOLD · 38 STONES</small></div></a>
+<a href="#" data-cursor><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="c3" cx=".5" cy=".6" r=".6"><stop offset="0" stop-color="#c0405e" stop-opacity=".35"/><stop offset="1" stop-opacity="0"/></radialGradient></defs><rect width="300" height="400" fill="url(#c3)"/><path d="M150 250l-60-60 30-40h60l30 40z" fill="none" stroke="#d8b36a" stroke-width="2"/><path d="M150 250l-20-100M150 250l20-100M90 190h120" stroke="#d8b36a" stroke-opacity=".6" fill="none"/></svg><div>Rubis Sanglant<small>ROSE GOLD · BURMA RUBY</small></div></a>
+</section>
+
+<footer><h2 data-split>By <em>appointment</em> only.</h2><div class="f"><span>Concept by Asad Matsumoto — fictional house, built to show WebGL + scroll</span><a href="../" data-cursor>← Back to the discography</a></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../shared/shared.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const S={rot:0,tilt:.25,scale:1,x:0,y:0,z:6,explode:0,spin:0,ring:0};
+let ok=true, renderer;
+try{
+  renderer=new THREE.WebGLRenderer({canvas:document.getElementById('gl'),antialias:true,alpha:true});
+}catch(e){ok=false;document.body.classList.add('nogl');}
+if(ok){
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+  const scene=new THREE.Scene();
+  const pm=new THREE.PMREMGenerator(renderer);
+  scene.environment=pm.fromScene(new RoomEnvironment(),.03).texture;
+  const cam=new THREE.PerspectiveCamera(32,1,.1,50);
+  // brilliant-cut silhouette via lathe: table, crown, girdle, pavilion, culet
+  const pts=[[0,1.05],[.62,1.05],[1.25,.62],[1.3,.5],[1.3,.38],[0,-1.55]].map(p=>new THREE.Vector2(p[0],p[1]));
+  const g=new THREE.LatheGeometry(pts,16);g.computeVertexNormals();
+  const mat=new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:1,roughness:.14,envMapIntensity:7,flatShading:true,iridescence:1,iridescenceIOR:2.0,iridescenceThicknessRange:[200,700],clearcoat:1,clearcoatRoughness:0});
+  const gem=new THREE.Mesh(g,mat);
+  const inner=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0x8fb2ff,transparent:true,opacity:.07,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+  inner.scale.setScalar(.97);
+  const grp=new THREE.Group();grp.add(gem,inner);scene.add(grp);
+  const k=new THREE.PointLight(0xffe2a8,60,20);k.position.set(3,3,4);scene.add(k);
+  const r=new THREE.PointLight(0x7fa6ff,40,20);r.position.set(-4,-1,3);scene.add(r);
+  function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+  size();addEventListener('resize',size);
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let t=0;
+  renderer.setAnimationLoop(()=>{
+    t+=.0045;
+    grp.rotation.y=S.rot+(reduced?0:t);grp.rotation.x=S.tilt;grp.rotation.z=Math.sin(t*.7)*.04;
+    const mob=innerWidth<800;
+    grp.scale.setScalar(S.scale*(mob?.8:1));
+    grp.position.set(mob?0:S.x,S.y,0);
+    cam.position.set(0,0,S.z);cam.lookAt(0,0,0);
+    k.position.x=3+Math.sin(t*2)*2;
+    renderer.render(scene,cam);
+  });
+}
+// ---- sparkle field ----
+const sc=document.getElementById('spark'),cx=sc.getContext('2d');let W,H,P=[];
+function rs(){W=sc.width=innerWidth;H=sc.height=innerHeight;}rs();addEventListener('resize',rs);
+for(let i=0;i<70;i++)P.push({x:Math.random(),y:Math.random(),s:Math.random()*1.6+.4,p:Math.random()*6.28,v:.4+Math.random()*1.2});
+let ST_y=0;
+(function draw(tm){
+  cx.clearRect(0,0,W,H);
+  for(const p of P){
+    const a=(Math.sin(tm*.001*p.v+p.p)+1)/2;
+    if(a<.55)continue;
+    const x=p.x*W,y=((p.y*H*1.6-ST_y*.15*p.s)%H+H)%H,l=p.s*9*a;
+    cx.globalAlpha=a*.9;cx.strokeStyle='#fff';cx.lineWidth=.8;
+    cx.beginPath();cx.moveTo(x-l,y);cx.lineTo(x+l,y);cx.moveTo(x,y-l);cx.lineTo(x,y+l);cx.stroke();
+  }
+  requestAnimationFrame(draw);
+})(0);
+// ---- scroll choreography ----
+A.init(function(gsap,ST,lenis){
+  if(lenis) lenis.on('scroll',e=>ST_y=e.scroll);
+  if(!gsap) return;
+  // hero → rough: gem enters small and large
+  S.scale=.8;S.z=7.5;S.y=-.2;
+  gsap.to(S,{scale:1.1,z:6,y:0,ease:'none',scrollTrigger:{trigger:'header',start:'top top',end:'bottom top',scrub:true}});
+  // section I (left copy) → gem moves right
+  gsap.to(S,{x:2.1,scale:.9,rot:Math.PI*.6,ease:'none',scrollTrigger:{trigger:'.scene.left',start:'top bottom',end:'bottom top',scrub:true}});
+  // tall pinned sequence
+  const steps=gsap.utils.toArray('.step');
+  const tl=gsap.timeline({scrollTrigger:{trigger:'#tall',start:'top top',end:'bottom bottom',scrub:.7}});
+  tl.to(S,{x:2.4,rot:Math.PI*1.2,scale:1.1,tilt:.5,duration:1})                    // cut
+    .to(steps[0],{opacity:1,duration:.2},0).to(steps[0],{opacity:0,duration:.2},.8)
+    .to(S,{x:-2.4,rot:Math.PI*3,scale:1.3,tilt:-.2,duration:1})                 // turn
+    .to(steps[1],{opacity:1,duration:.2},1).to(steps[1],{opacity:0,duration:.2},1.8)
+    .to(S,{x:0,y:1.0,rot:Math.PI*4.2,scale:.55,tilt:.05,duration:1})            // set
+    .to('#ring',{opacity:1,duration:.5},2.2)
+    .to(steps[2],{opacity:1,duration:.2},2).to(steps[2],{opacity:1,duration:.2},2.8);
+  // leave: gem shrinks away for the collection
+  gsap.to(S,{y:-1.6,scale:.001,ease:'power1.in',scrollTrigger:{trigger:'.col',start:'top 85%',end:'top 20%',scrub:true}});
+  gsap.to('#ring',{opacity:0,scrollTrigger:{trigger:'.col',start:'top 90%',end:'top 50%',scrub:true}});
+});
+</script>
+<noscript><style>.w>i{transform:none}[data-reveal]{opacity:1;transform:none}.tall{height:auto}.tall .step{position:relative;opacity:1;transform:none;top:auto;padding:6vh 6vw}</style></noscript>
+</body>
+</html>

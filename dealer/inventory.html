@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New &amp; Used Inventory · Halcyon Chevrolet (Concept)</title>
+<meta name="description" content="Concept SRP: jQuery facet filters with live counts, pills, sort, grid/list and a collapsible price stack with disclaimer modals.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="dealer.css">
+</head>
+<body data-page="srp">
+<main id="main">
+<div class="container">
+  <div class="crumbs"><a href="index.html">Home</a> / Inventory</div>
+  <div class="srp-h"><div><h1 id="srpTitle">All Inventory</h1><span class="ct">Showing <b id="cnt">0</b> vehicles</span></div>
+    <div class="srp-tools"><button class="btn btn-line mobfil" id="mobFil" aria-controls="filters">Filters</button><label class="sr-only" for="sort">Sort</label><select id="sort"><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="year">Year: newest</option><option value="miles">Mileage: lowest</option></select>
+    <div class="view-tog" role="group" aria-label="View"><button type="button" data-v="grid" aria-pressed="true">Grid</button><button type="button" data-v="list" aria-pressed="false">List</button></div></div></div>
+  <div class="row">
+    <aside class="col-md-3"><div class="filters" id="filters" aria-label="Filters"></div></aside>
+    <div class="col-md-9"><div class="pills" id="pills" aria-live="polite"></div><div class="grid-cards" id="results" aria-live="polite"></div>
+      <p class="fine-print" style="margin:22px 0 40px">Prices include the $549 documentation fee and exclude tax, title, license and registration. Manufacturer incentives require retail delivery from dealer stock by 11/02/2026. Conditional offers are shown separately and require proof of eligibility. Stock photos may not represent the actual vehicle. See dealer for complete details.</p></div>
+  </div>
+</div>
+<div id="cmpBar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;background:var(--navy);color:#fff;padding:12px 0"><div class="container" style="display:flex;justify-content:space-between;align-items:center"><span><b>0</b> selected to compare</span><button class="btn btn-cta" data-lead="Compare vehicles">Compare</button></div></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="inventory.js"></script>
+<script src="dealer.js"></script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Camaro ZL1 · Halcyon Motor Group — Concept by Asad Matsumoto</title>
+<meta name="description" content="Concept model page for a fictional Chevrolet dealer: a Certified Pre-Owned Camaro ZL1 told through WebGL, scroll choreography and a working dealer price stack.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="../img/cars/zl1-hero.webp">
+<link rel="stylesheet" href="../shared/shared.css">
+<style>
+:root{--bg:#060606;--ink:#f2f0ed;--mut:#8f8a84;--red:#e0262b;--accent:#e0262b;--line:rgba(242,240,237,.12);--disp:'Big Shoulders Display',Impact,sans-serif;--body:'Barlow',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+/* dealer bar — the OEM-dealer chrome every DealerOn site carries */
+.util{position:fixed;z-index:70;top:0;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:#000;border-bottom:1px solid var(--line);font:500 12px var(--body);color:var(--mut)}
+.util b{color:var(--ink);font-weight:600}.util a{color:var(--ink)}
+.util .r{display:flex;gap:22px}
+@media(max-width:700px){.util .hide{display:none}}
+.nav{position:fixed;z-index:70;top:34px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:16px 3vw;transition:background .4s,backdrop-filter .4s}
+.nav.solid{background:rgba(6,6,6,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.logo{font:900 22px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase}
+.logo span{color:var(--red)}
+.nav ul{display:flex;gap:26px;list-style:none;font:600 13px var(--body);letter-spacing:.06em;text-transform:uppercase}
+.nav .btn{padding:10px 18px}
+@media(max-width:860px){.nav ul{display:none}}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;font:600 13px var(--body);letter-spacing:.08em;text-transform:uppercase;padding:15px 24px;border:0;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:filter .2s,transform .2s}
+.btn:hover{filter:brightness(1.15)}.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);clip-path:none}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* ===== HERO: GL stage, pinned ===== */
+.hero{height:260vh;position:relative}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden}
+.stage canvas,.stage .fb{position:absolute;inset:0;width:100%;height:100%}
+.stage .fb{object-fit:cover;display:none}
+.nogl .stage .fb{display:block}
+.hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,6,.55),transparent 30%,transparent 48%,rgba(6,6,6,.92) 88%),radial-gradient(40% 45% at 88% 78%,rgba(6,6,6,.75),transparent 70%);pointer-events:none}
+.hero .side{text-shadow:0 2px 18px rgba(0,0,0,.6)}
+.hero .t1{position:absolute;left:3vw;right:3vw;bottom:9vh;display:flex;align-items:flex-end;justify-content:space-between;gap:4vw;flex-wrap:wrap}
+.hero h1{font:900 clamp(110px,24vw,420px)/.78 var(--disp);letter-spacing:-.01em;text-transform:uppercase;position:relative}
+.hero h1 .o{color:transparent;-webkit-text-stroke:2px rgba(242,240,237,.9)}
+.hero h1 .f{position:absolute;inset:0;color:var(--red);clip-path:inset(0 100% 0 0)}
+.hero .side{max-width:340px;padding-bottom:2vh}
+.hero .side h2{font:800 clamp(22px,2.3vw,34px)/1.05 var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.hero .side p{color:var(--mut);margin:12px 0 22px;font-size:15px}
+.hero .top{position:absolute;top:120px;left:3vw;right:3vw;display:flex;justify-content:space-between;color:var(--mut)}
+.hero .t2{position:absolute;inset:0;display:grid;place-items:center;text-align:center;opacity:0;pointer-events:none}
+.hero .t2 h2{font:900 clamp(56px,10vw,170px)/.85 var(--disp);text-transform:uppercase}
+.hero .t2 h2 em{font-style:normal;color:var(--red)}
+.hero .t2 p{margin-top:2vh;color:#d8d3cd}
+.ign{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font:600 12px var(--mono);letter-spacing:.4em;color:var(--red);pointer-events:none}
+.rm .ign{display:none}
+.hint{position:absolute;right:3vw;bottom:3vh;color:var(--mut)}
+
+/* ===== TACH ===== */
+.tach{height:240vh;position:relative}
+.tach .pin{position:sticky;top:0;height:100vh;display:grid;grid-template-columns:1.05fr 1fr;align-items:center;gap:4vw;padding:0 4vw;overflow:hidden}
+.gauge{position:relative;aspect-ratio:1;width:min(44vw,640px);justify-self:center}
+.gauge svg{width:100%;height:100%;overflow:visible}
+.gauge .rpm{position:absolute;left:0;right:0;top:57%;text-align:center}
+.gauge .rpm b{display:block;font:900 clamp(44px,5.4vw,88px)/.8 var(--disp);font-variant-numeric:tabular-nums;margin-bottom:8px}
+.gauge .rpm span{color:var(--mut)}
+.specs{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.specs div{padding:3.2vh 0;border-bottom:1px solid var(--line)}
+.specs div:nth-child(odd){padding-right:2vw;border-right:1px solid var(--line)}
+.specs div:nth-child(even){padding-left:2vw}
+.specs b{display:block;font:900 clamp(48px,6vw,104px)/.85 var(--disp);font-variant-numeric:tabular-nums}
+.specs b small{font-size:.38em;color:var(--red);margin-left:.15em}
+.specs span{color:var(--mut)}
+.tach h2{font:900 clamp(40px,4.6vw,80px)/.9 var(--disp);text-transform:uppercase;margin-bottom:4vh}
+.tach h2 em{font-style:normal;color:var(--red)}
+@media(max-width:900px){.tach .pin{grid-template-columns:1fr;align-content:center;gap:3vh}.gauge{width:min(70vw,360px)}.specs b{font-size:46px}.tach h2{margin-bottom:2vh}}
+
+/* ===== BREATHE: second GL stage w/ callouts ===== */
+.breathe{height:320vh;position:relative}
+.breathe .stage .shade{position:absolute;inset:0;background:radial-gradient(80% 70% at 50% 50%,transparent 40%,rgba(6,6,6,.85));pointer-events:none}
+.call{position:absolute;max-width:300px;opacity:0;transform:translateY(20px)}
+.call .k{color:var(--red)}
+.call h3{font:800 clamp(26px,2.6vw,40px)/1 var(--disp);text-transform:uppercase;margin:8px 0}
+.call p{color:#cfc9c2;font-size:15px}
+.call:before{content:"";display:block;width:56px;height:2px;background:var(--red);margin-bottom:14px}
+.c1{left:4vw;top:22vh}.c2{right:4vw;top:40vh;text-align:right}.c2:before{margin-left:auto}.c3{left:4vw;bottom:12vh}
+.breathe .big{position:absolute;left:0;right:0;bottom:-3vw;text-align:center;font:900 22vw/1 var(--disp);color:transparent;-webkit-text-stroke:1px rgba(242,240,237,.16);pointer-events:none;text-transform:uppercase}
+
+/* ===== STRIP ===== */
+.strip{height:100vh;overflow:hidden;position:relative;display:flex;align-items:center}
+.strip .tr{display:flex;gap:2.4vw;padding:0 4vw;will-change:transform}
+.strip .intro{flex:0 0 min(420px,80vw);padding-right:3vw}
+.strip .intro h2{font:900 clamp(48px,5.5vw,96px)/.88 var(--disp);text-transform:uppercase}
+.strip .intro h2 em{font-style:normal;color:var(--red)}
+.strip .intro p{color:var(--mut);margin-top:2vh}
+.fr{flex:0 0 auto;height:72vh;aspect-ratio:4/5;position:relative;overflow:hidden;background:#111}
+.fr.w{aspect-ratio:3/2}
+.fr img{position:absolute;top:0;left:-12%;width:124%;height:100%;object-fit:cover;will-change:transform}
+.fr figcaption{position:absolute;left:0;right:0;bottom:0;padding:20px 22px;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.fr figcaption b{display:block;font:800 26px/1 var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.fr figcaption span{color:#bdb6ae;font-size:14px}
+.fr .n{position:absolute;top:18px;left:22px;color:#fff;mix-blend-mode:difference}
+
+/* ===== LISTING (VDP block) ===== */
+.vdp{padding:16vh 4vw 12vh;display:grid;grid-template-columns:1.25fr 1fr;gap:4vw;align-items:start;border-top:1px solid var(--line)}
+.vdp .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:sticky;top:120px}
+@media(max-width:900px){.vdp .gal{position:static}}
+.vdp .gal .main{grid-column:1/-1;aspect-ratio:16/10;overflow:hidden;position:relative;background:#111}
+.vdp .gal .main img{width:100%;height:100%;object-fit:cover;transition:opacity .35s}
+.vdp .gal button{aspect-ratio:4/3;padding:0;border:0;background:#111;cursor:pointer;overflow:hidden;opacity:.55;transition:opacity .2s;outline-offset:2px}
+.vdp .gal button[aria-pressed="true"],.vdp .gal button:hover{opacity:1}
+.vdp .gal button img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:14px;left:14px;background:#0b3d91;color:#fff;font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;padding:7px 10px}
+.vdp h2{font:900 clamp(40px,4vw,64px)/.9 var(--disp);text-transform:uppercase}
+.vdp .sub{color:var(--mut);margin:10px 0 22px}
+.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border-top:1px solid var(--line);margin-bottom:24px}
+.meta div{padding:12px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.meta div:nth-child(odd){padding-right:16px;border-right:1px solid var(--line)}
+.meta div:nth-child(even){padding-left:16px}
+.meta span{color:var(--mut)}
+.stack{background:#0e0e0e;border:1px solid var(--line);padding:22px}
+.stack .row{display:flex;justify-content:space-between;padding:7px 0;font-size:15px}
+.stack .row.s{color:#7bd389}
+.stack .row.tot{border-top:1px solid var(--line);margin-top:8px;padding-top:14px;font:800 30px/1 var(--disp);letter-spacing:.02em}
+.stack .row.tot span:last-child{color:var(--ink)}
+.ctas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.ctas .btn{justify-content:center;padding:14px 10px}
+.calc{margin-top:16px;border:1px solid var(--line);padding:18px 22px}
+.calc h3{font:800 20px var(--disp);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.calc label{display:block;font-size:13px;color:var(--mut);margin-top:12px}
+.calc .ln{display:flex;justify-content:space-between}
+.calc input[type=range]{width:100%;accent-color:var(--red);height:28px}
+.seg{display:flex;gap:6px;margin-top:6px}
+.seg button{flex:1;background:#111;border:1px solid var(--line);color:var(--ink);padding:10px 0;font:600 13px var(--body);cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--red);background:rgba(224,38,43,.14)}
+.pay{display:flex;align-items:baseline;justify-content:space-between;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.pay b{font:900 46px/1 var(--disp);font-variant-numeric:tabular-nums}
+.disc{font-size:11.5px;line-height:1.55;color:#77716b;margin-top:14px}
+@media(max-width:900px){.vdp{grid-template-columns:1fr}}
+
+/* modal */
+dialog{margin:auto;border:1px solid var(--line);background:#0c0c0c;color:var(--ink);padding:28px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+dialog h3{font:900 32px/1 var(--disp);text-transform:uppercase}
+dialog label{display:block;font-size:13px;color:var(--mut);margin-top:14px}
+dialog input{width:100%;margin-top:6px;background:#111;border:1px solid var(--line);color:var(--ink);padding:12px;font:16px var(--body)}
+dialog .x{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--mut);font-size:22px;cursor:pointer}
+dialog .ok{display:none;color:#7bd389;margin-top:14px}
+
+footer{padding:10vh 4vw 14vh;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:4vw;color:var(--mut);font-size:13px}
+footer h4{color:var(--ink);font:800 18px var(--disp);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+footer li{list-style:none;margin:4px 0}
+footer a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:800px){footer{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="curs"></div>
+
+<div class="util"><span><b>Halcyon Motor Group</b> <span class="hide">· Sales open today 9:00–8:00</span></span><span class="r"><span class="hide">Sales <a href="tel:5550100199">(555) 010-0199</a></span><span class="hide">Service <a href="tel:5550100142">(555) 010-0142</a></span><span>Concept · fictional dealer</span></span></div>
+<nav class="nav" id="nav"><div class="logo">Halcyon<span>/</span>Performance</div><ul><li>New</li><li>Pre-Owned</li><li>Specials</li><li>Finance</li><li>Service</li></ul><a class="btn" href="#vdp" data-cursor>View this ZL1</a></nav>
+
+<header class="hero" id="hero">
+  <div class="stage">
+    <img class="fb" src="../img/cars/zl1-hero.webp" alt="White Chevrolet Camaro ZL1 in a dark garage, headlights on">
+    <canvas id="gl1" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="ign mono" id="ign">Lights</div>
+    <div class="top mono"><span>Certified Pre-Owned · Stock #H24-0650</span><span>Supercharged 6.2L V8</span></div>
+    <div class="t1" id="t1">
+      <h1><span class="o">ZL1</span><span class="f" id="fill" aria-hidden="true">ZL1</span></h1>
+      <div class="side"><h2>650 horsepower.<br>Last of its kind.</h2><p>The sixth-generation Camaro ended production in 2024. This is one of the good ones: one owner, garage-kept, every service at our store.</p><a class="btn" href="#vdp" data-cursor>See price &amp; history →</a></div>
+    </div>
+    <div class="t2" id="t2"><div><h2>No longer<br><em>in production.</em></h2><p class="mono">Still in our showroom</p></div></div>
+    <div class="hint mono">Scroll</div>
+  </div>
+</header>
+
+<section class="tach" id="tach">
+  <div class="pin">
+    <div class="gauge" aria-hidden="true">
+      <svg viewBox="-200 -200 400 400" id="gsvg"></svg>
+      <div class="rpm"><b id="rpm">0</b><span class="mono">RPM × 1</span></div>
+    </div>
+    <div>
+      <h2 data-split>The numbers <em>still hold up.</em></h2>
+      <div class="specs">
+        <div><b data-count="650">0</b><span>Horsepower, LT4 supercharged</span></div>
+        <div><b data-count="650">0</b><span>lb-ft of torque</span></div>
+        <div><b data-count="3.5" data-dec="1">0</b><span>Seconds, 0–60 mph (10-speed, Chevrolet figure)</span></div>
+        <div><b data-count="6.2" data-dec="1">0<small>L</small></b><span>Small-block V8, 1.7L blower</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="breathe" id="breathe">
+  <div class="stage">
+    <img class="fb" src="../img/cars/zl1-black.webp" alt="Black Camaro ZL1 front end, hood open">
+    <canvas id="gl2" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="big">Breathe</div>
+    <div class="call c1"><span class="mono k">01 · Cooling</span><h3>Eleven heat exchangers</h3><p>Every opening in that fascia feeds something: engine, transmission, differential, supercharger intercooler.</p></div>
+    <div class="call c2"><span class="mono k">02 · Aero</span><h3>Downforce you can see</h3><p>Front splitter and dive planes on 1LE-package cars push the nose into the pavement at speed.</p></div>
+    <div class="call c3"><span class="mono k">03 · Control</span><h3>Magnetic Ride Control</h3><p>The dampers read the road a thousand times a second. Track one day, commute the next.</p></div>
+  </div>
+</section>
+
+<section class="strip" id="strip">
+  <div class="tr" id="tr">
+    <div class="intro"><h2 data-split>Look <em>closer.</em></h2><p>Real photographs. Every hardware callout is a factory ZL1 feature.</p></div>
+    <figure class="fr"><span class="n mono">01</span><img src="../img/cars/zl1-wheel.webp" alt="ZL1 wheel and red Brembo caliper" loading="lazy"><figcaption><b>Brembo six-piston</b><span>Front calipers, red, not optional</span></figcaption></figure>
+    <figure class="fr w"><span class="n mono">02</span><img src="../img/cars/zl1-engine.webp" alt="LT4 supercharged V8 engine bay" loading="lazy"><figcaption><b>LT4 V8</b><span>Supercharged 6.2 litres, direct injection</span></figcaption></figure>
+    <figure class="fr"><span class="n mono">03</span><img src="../img/cars/zl1-detail.webp" alt="Close-up of ZL1 headlight and front aero" loading="lazy"><figcaption><b>Carbon details</b><span>Hood insert and front aero</span></figcaption></figure>
+    <figure class="fr w"><span class="n mono">04</span><img src="../img/cars/zl1-front.webp" alt="White Camaro ZL1 1LE on an auto show stand" loading="lazy"><figcaption><b>1LE package</b><span>The track-day spec, shown at the NY Auto Show</span></figcaption></figure>
+    <figure class="fr w"><span class="n mono">05</span><img src="../img/cars/zl1-rear.webp" alt="Rear of white Camaro ZL1" loading="lazy"><figcaption><b>eLSD + PTM</b><span>Electronic limited-slip and Performance Traction Management</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="vdp" id="vdp" aria-labelledby="vdpH">
+  <div class="gal" id="gal">
+    <div class="main"><span class="badge">Certified Pre-Owned</span><img id="galMain" src="../img/cars/zl1-34.webp" alt="White Camaro ZL1 three-quarter view"></div>
+    <button aria-pressed="true" data-src="../img/cars/zl1-34.webp" data-alt="White Camaro ZL1 three-quarter view"><img src="../img/cars/zl1-34.webp" alt="" loading="lazy"></button>
+    <button aria-pressed="false" data-src="../img/cars/zl1-front.webp" data-alt="Camaro ZL1 front"><img src="../img/cars/zl1-front.webp" alt="" loading="lazy"></button>
+    <button aria-pressed="false" data-src="../img/cars/zl1-rear.webp" data-alt="Camaro ZL1 rear"><img src="../img/cars/zl1-rear.webp" alt="" loading="lazy"></button>
+    <button aria-pressed="false" data-src="../img/cars/zl1-wheel.webp" data-alt="ZL1 wheel and brake"><img src="../img/cars/zl1-wheel.webp" alt="" loading="lazy"></button>
+  </div>
+  <div>
+    <span class="mono" style="color:var(--red)">Certified Pre-Owned</span>
+    <h2 id="vdpH">2022 Chevrolet Camaro ZL1 Coupe</h2>
+    <p class="sub">Summit White · Jet Black interior · 10-speed automatic · RWD</p>
+    <div class="meta">
+      <div><span>Mileage</span><b>8,412 mi</b></div><div><span>Stock #</span><b>H24-0650</b></div>
+      <div><span>Engine</span><b>6.2L SC V8</b></div><div><span>Drivetrain</span><b>RWD · 10-spd auto</b></div>
+      <div><span>Owners</span><b>1 (history report)</b></div><div><span>VIN</span><b>On request</b></div>
+    </div>
+    <div class="stack" aria-label="Price">
+      <div class="row"><span>Retail price</span><span>$68,995</span></div>
+      <div class="row"><span>Documentation fee</span><span>$549</span></div>
+      <div class="row s"><span>Halcyon discount</span><span>−$2,000</span></div>
+      <div class="row tot"><span>Halcyon price</span><span id="price">$67,544</span></div>
+      <div class="row" style="font-size:13px;color:var(--mut)"><span>Conditional: military / first responder*</span><span>−$500</span></div>
+      <div class="ctas">
+        <button class="btn" data-lead="Confirm availability">Confirm availability</button>
+        <button class="btn ghost" data-lead="Get ePrice">Get ePrice</button>
+        <button class="btn ghost" data-lead="Value your trade">Value your trade</button>
+        <button class="btn ghost" data-lead="Schedule a test drive">Test drive</button>
+      </div>
+    </div>
+    <div class="calc">
+      <h3>Estimate your payment</h3>
+      <label for="down"><span class="ln"><span>Down payment</span><span id="downV">$8,000</span></span></label>
+      <input type="range" id="down" min="0" max="30000" step="500" value="8000">
+      <label for="apr"><span class="ln"><span>APR (estimated)</span><span id="aprV">6.9%</span></span></label>
+      <input type="range" id="apr" min="2.9" max="14.9" step="0.1" value="6.9">
+      <label>Term</label>
+      <div class="seg" id="term" role="group" aria-label="Term in months"><button aria-pressed="false" data-m="48">48</button><button aria-pressed="false" data-m="60">60</button><button aria-pressed="true" data-m="72">72</button><button aria-pressed="false" data-m="84">84</button></div>
+      <div class="pay"><span class="mono">Est. monthly</span><b id="pay" aria-live="polite">$0</b></div>
+    </div>
+    <p style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="../dealer/vehicle.html?stock=H24-0650" data-cursor>Open the full listing →</a><a class="btn ghost" href="../dealer/inventory.html?body=Coupe" data-cursor>Shop performance inventory</a></p>
+    <p class="disc">Illustrative listing on a concept site. Price includes a $549 documentation fee and excludes tax, title, license and registration. *Conditional offer, shown separately from the price everyone pays; requires proof of eligibility. Payment is an estimate for comparison only, not an offer of credit; actual APR depends on credit approval. Vehicle may be sold before you read this. See dealer for details.</p>
+  </div>
+</section>
+
+<dialog id="lead" aria-labelledby="leadH">
+  <button class="x" aria-label="Close" data-close>×</button>
+  <h3 id="leadH">Confirm availability</h3>
+  <p class="mono" style="color:var(--mut);margin-top:6px">2022 Camaro ZL1 · H24-0650</p>
+  <form id="leadF">
+    <label>First name<input name="f" autocomplete="given-name" required></label>
+    <label>Email<input name="e" type="email" autocomplete="email" required></label>
+    <label>Phone<input name="p" type="tel" autocomplete="tel"></label>
+    <button class="btn" style="margin-top:18px;width:100%;justify-content:center">Send</button>
+    <p class="ok" id="ok" role="status">Concept form, so nothing was sent. On a live DealerOn-style site this posts to the dealer CRM as an ADF lead.</p>
+  </form>
+</dialog>
+
+<footer>
+  <div><h4>Concept</h4><p>Halcyon Motor Group is fictional. This page was designed and built by Asad Matsumoto to show dealership model pages done with cinema-grade motion: a custom WebGL stage, scroll choreography, and a working price stack and payment estimate. Not affiliated with Chevrolet or General Motors. Chevrolet, Camaro and ZL1 are trademarks of General Motors. Specs are Chevrolet’s published figures for the 2017–2024 ZL1.</p><p style="margin-top:14px"><a href="../" data-cursor>← Back to the discography</a></p></div>
+  <div><h4>Photography (Wikimedia Commons)</h4><ul id="credits"></ul></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../shared/shared.js"></script>
+<script src="../shared/glfx.js"></script>
+<script>
+(function(){
+  var CREDITS=[["zl1-hero","Peter Broomfield (Unsplash)","CC0","Luxury_Vehicle_Resort_(Unsplash).jpg"],["zl1-black","Nicholas Good","CC BY 2.0","Caffeine_and_Octane_(1).jpg"],["zl1-detail","Nicholas Good","CC BY 2.0","Caffeine_and_Octane_(2).jpg"],["zl1-wheel","Nicholas Good","CC BY 2.0","Caffeine_and_Octane_(3).jpg"],["zl1-engine","squeuei","CC BY 2.0","Camaro_ZL1_Engine.jpg"],["zl1-front","Carsfera","CC BY 2.0","Camaro_at_2017_New_York_Auto_Show_(1).jpg"],["zl1-34","Carsfera","CC BY 2.0","Camaro_at_2017_New_York_Auto_Show_(2).jpg"],["zl1-rear","Carsfera","CC BY 2.0","Camaro_at_2017_New_York_Auto_Show_(3).jpg"]];
+  document.getElementById('credits').innerHTML=CREDITS.map(function(c){return '<li><a href="https://commons.wikimedia.org/wiki/File:'+c[3]+'" rel="noopener">'+c[3].replace(/_/g,' ')+'</a> · '+c[1]+' · '+c[2]+'</li>';}).join('');
+
+  // ---------- tach face ----------
+  var g=document.getElementById('gsvg'),NS='http://www.w3.org/2000/svg',A0=-225,A1=45,R=168;
+  function pol(a,r){a=a*Math.PI/180;return [Math.cos(a)*r,Math.sin(a)*r];}
+  function el(n,at){var e=document.createElementNS(NS,n);for(var k in at)e.setAttribute(k,at[k]);g.appendChild(e);return e;}
+  function arc(r,a0,a1){var p0=pol(a0,r),p1=pol(a1,r);return 'M'+p0+'A'+r+','+r+' 0 '+((a1-a0)>180?1:0)+' 1 '+p1;}
+  el('path',{d:arc(R,A0,A1),fill:'none',stroke:'rgba(242,240,237,.12)','stroke-width':2});
+  el('path',{d:arc(R,A0+(A1-A0)*6.6/8,A1),fill:'none',stroke:'#e0262b','stroke-width':10});
+  var live=el('path',{d:arc(R-18,A0,A0+.01),fill:'none',stroke:'#e0262b','stroke-width':3,'stroke-linecap':'round'});
+  for(var i=0;i<=80;i++){var a=A0+(A1-A0)*i/80,maj=i%10===0,p0=pol(a,R-(maj?26:12)),p1=pol(a,R-2);el('line',{x1:p0[0],y1:p0[1],x2:p1[0],y2:p1[1],stroke:i>=66?'#e0262b':'rgba(242,240,237,'+(maj?.9:.35)+')','stroke-width':maj?3:1.2});
+    if(maj){var t=pol(a,R-48);var tx=el('text',{x:t[0],y:t[1]+7,'text-anchor':'middle',fill:i>=66?'#e0262b':'#f2f0ed','font-family':'Big Shoulders Display','font-weight':800,'font-size':22});tx.textContent=i/10;}}
+  var needle=el('g',{});var nl=document.createElementNS(NS,'path');nl.setAttribute('d','M-4,0 L0,-150 L4,0 Z');nl.setAttribute('fill','#e0262b');needle.appendChild(nl);
+  el('circle',{r:12,fill:'#0b0b0b',stroke:'#e0262b','stroke-width':2});
+  function setRpm(v){var a=A0+(A1-A0)*v/8000;needle.setAttribute('transform','rotate('+(a+90)+')');live.setAttribute('d',arc(R-18,A0,Math.max(A0+.01,a)));document.getElementById('rpm').textContent=Math.round(v/10)*10;}
+  setRpm(800);
+
+  // ---------- gallery / calc / lead modal (plain DOM; the dealer demo uses jQuery) ----------
+  var main=document.getElementById('galMain');
+  document.querySelectorAll('#gal button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#gal button').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');main.style.opacity=0;setTimeout(function(){main.src=b.dataset.src;main.alt=b.dataset.alt;main.style.opacity=1;},180);});});
+  var price=67544,term=72;
+  function money(n){return '$'+Math.round(n).toLocaleString('en-US');}
+  function calc(){var d=+down.value,r=+apr.value/1200,p=price-d;var m=r?p*r/(1-Math.pow(1+r,-term)):p/term;document.getElementById('pay').textContent=money(Math.max(0,m));document.getElementById('downV').textContent=money(d);document.getElementById('aprV').textContent=(+apr.value).toFixed(1)+'%';}
+  var down=document.getElementById('down'),apr=document.getElementById('apr');down.oninput=apr.oninput=calc;
+  document.querySelectorAll('#term button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#term button').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');term=+b.dataset.m;calc();};});
+  calc();
+  var dlg=document.getElementById('lead');
+  document.querySelectorAll('[data-lead]').forEach(function(b){b.onclick=function(){document.getElementById('leadH').textContent=b.dataset.lead;document.getElementById('ok').style.display='none';dlg.showModal();};});
+  dlg.querySelector('[data-close]').onclick=function(){dlg.close();};
+  document.getElementById('leadF').onsubmit=function(e){e.preventDefault();document.getElementById('ok').style.display='block';};
+
+  // ---------- GL stages ----------
+  var fx1=GLFX(document.getElementById('gl1'),['../img/cars/zl1-hero.webp','../img/cars/zl1-black.webp'],{edge:[1,.16,.08],ex:0});
+  var fx2=GLFX(document.getElementById('gl2'),['../img/cars/zl1-black.webp','../img/cars/zl1-detail.webp','../img/cars/zl1-wheel.webp'],{edge:[1,.16,.08]});
+  if(!fx1||!fx2) document.documentElement.classList.add('nogl');
+  if(fx1 && A.rm) fx1.s.ex=1;
+
+  // nav goes solid after the hero
+  addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('solid',scrollY>innerHeight*.5);},{passive:true});
+
+  A.init(function(gsap,ST){
+    if(!gsap){ setRpm(6500); document.querySelectorAll('[data-count]').forEach(function(b){b.firstChild.nodeValue=b.dataset.count;}); document.querySelectorAll('.call').forEach(function(c){c.style.opacity=1;c.style.transform='none'}); return; }
+    // garage lights: fluorescent flicker on load
+    if(fx1){
+      var ign=document.getElementById('ign');
+      var on=function(){ gsap.timeline()
+        .to(fx1.s,{ex:.5,duration:.06}).to(fx1.s,{ex:.04,duration:.08}).to(fx1.s,{ex:.85,duration:.05})
+        .to(fx1.s,{ex:.12,duration:.12}).to(fx1.s,{ex:.7,duration:.05}).to(fx1.s,{ex:.3,duration:.05})
+        .to(fx1.s,{ex:1.08,duration:.9,ease:'power2.out'}).to(fx1.s,{ex:1,duration:.6})
+        .to(ign,{opacity:0,duration:.3},0)
+        .fromTo('#t1 .o',{opacity:0,y:60},{opacity:1,y:0,duration:1.2,ease:'expo.out'},.5)
+        .fromTo('#t1 .side',{opacity:0,y:30},{opacity:1,y:0,duration:1,ease:'power3.out'},.9); };
+      if(fx1.ready) setTimeout(on,350); else fx1.onready=function(){setTimeout(on,350)};
+    }
+    // hero scroll: red fill wipes through the stroke, then dissolve to the black car
+    var h=gsap.timeline({scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom bottom',scrub:.8}});
+    h.to('#fill',{clipPath:'inset(0 0% 0 0)',ease:'none',duration:.35},0)
+     .to('#t1',{opacity:0,y:-60,duration:.2},.42)
+     .to(fx1?fx1.s:{}, {p:1,zm:1.12,ab:1.2,duration:.45,ease:'power1.inOut'},.45)
+     .to('#t2',{opacity:1,duration:.15},.72).to('#t2',{opacity:0,duration:.12},.93);
+    // tach: needle climbs to redline as you scroll, spec numbers count up
+    var tv={r:800};
+    var tt=gsap.timeline({scrollTrigger:{trigger:'#tach',start:'top top',end:'bottom bottom',scrub:.4}});
+    tt.to(tv,{r:6600,ease:'power2.in',duration:1,onUpdate:function(){setRpm(tv.r)}},0);
+    document.querySelectorAll('[data-count]').forEach(function(b,i){
+      var o={v:0},dec=+(b.dataset.dec||0),tn=b.firstChild;
+      tt.to(o,{v:+b.dataset.count,ease:'power1.out',duration:.42,onUpdate:function(){tn.nodeValue=o.v.toFixed(dec);}},.05+i*.1);
+    });
+    // breathe: three photos, push-in, callouts on the beat
+    if(fx2){ fx2.s.zm=1.0;
+      var b=gsap.timeline({scrollTrigger:{trigger:'#breathe',start:'top top',end:'bottom bottom',scrub:.8}});
+      var sq={x:0};
+      b.to(fx2.s,{zm:1.22,duration:1,ease:'none'},0)
+       .to(sq,{x:2,duration:2,ease:'none',onUpdate:function(){fx2.seq(sq.x<1?Math.max(0,(sq.x-.55)/.45):1+Math.max(0,(sq.x-1.55)/.45))}},0)
+       .to(fx2.s,{zm:1.0,duration:.01},1)
+       .to(fx2.s,{zm:1.25,duration:1,ease:'none'},1.01)
+       .to('.c1',{opacity:1,y:0,duration:.18},.12).to('.c1',{opacity:0,duration:.12},.62)
+       .to('.c2',{opacity:1,y:0,duration:.18},.82).to('.c2',{opacity:0,duration:.12},1.32)
+       .to('.c3',{opacity:1,y:0,duration:.18},1.55).to('.c3',{opacity:.0,duration:.12},1.95);
+    }
+    // strip: horizontal track, photos drift inside their frames
+    var tr=document.getElementById('tr');
+    var ht=gsap.to(tr,{x:function(){return -(tr.scrollWidth-innerWidth)},ease:'none',scrollTrigger:{trigger:'#strip',start:'top top',end:function(){return '+='+(tr.scrollWidth-innerWidth)},pin:true,scrub:.8,invalidateOnRefresh:true}});
+    document.querySelectorAll('.fr img').forEach(function(im){gsap.fromTo(im,{xPercent:-7},{xPercent:7,ease:'none',scrollTrigger:{trigger:im.parentNode,containerAnimation:ht,start:'left right',end:'right left',scrub:true}});});
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M4 Competition · Halcyon Motor Group — Concept by Asad Matsumoto</title>
+<meta name="description" content="Concept model page for a fictional BMW dealer: the M4 Competition told through a WebGL stage, an interactive drive-mode selector, scroll-revealed hotspots and a colorway switcher.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="../img/cars/m4-dc.webp">
+<link rel="stylesheet" href="../shared/shared.css">
+<style>
+:root{--bg:#07090c;--ink:#eef1f5;--mut:#8792a2;--line:rgba(238,241,245,.12);--accent:#3d8bff;--m1:#5fb6ff;--m2:#1c3faa;--m3:#e22718;--sans:'Archivo',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--sans);transition:--accent .4s}
+.mono{font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.x{font-stretch:125%;font-weight:800;text-transform:uppercase;letter-spacing:-.01em}
+.stripe{display:inline-flex;height:4px;width:54px;vertical-align:middle}
+.stripe i{flex:1}.stripe i:nth-child(1){background:var(--m1)}.stripe i:nth-child(2){background:var(--m2)}.stripe i:nth-child(3){background:var(--m3)}
+.util{position:fixed;z-index:70;top:0;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:#000;border-bottom:1px solid var(--line);font:500 12px var(--sans);color:var(--mut)}
+.util b{color:var(--ink)}.util a{color:var(--ink)}.util .r{display:flex;gap:22px}
+@media(max-width:700px){.util .hide{display:none}}
+.nav{position:fixed;z-index:70;top:34px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:16px 3vw;transition:background .4s}
+.nav.solid{background:rgba(7,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{font:800 17px/1 var(--sans);font-stretch:125%;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.nav ul{display:flex;gap:28px;list-style:none;font:500 13px var(--sans);letter-spacing:.04em}
+@media(max-width:860px){.nav ul{display:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--ink);color:#07090c;font:600 13px var(--sans);letter-spacing:.06em;text-transform:uppercase;padding:15px 24px;border:0;cursor:pointer;transition:background .25s,color .25s}
+.btn:hover{background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--accent);background:transparent}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* HERO */
+.hero{height:230vh;position:relative}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden}
+.stage canvas,.stage .fb{position:absolute;inset:0;width:100%;height:100%}
+.stage .fb{object-fit:cover;display:none}.nogl .stage .fb{display:block}
+.hero .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,12,.85),rgba(7,9,12,.15) 55%,transparent),linear-gradient(0deg,rgba(7,9,12,.9),transparent 35%);pointer-events:none}
+.hud{position:absolute;inset:118px 3vw 4vh;pointer-events:none}
+.hud .c{position:absolute;width:22px;height:22px;border-color:rgba(238,241,245,.55);border-style:solid;border-width:0}
+.hud .tl{top:0;left:0;border-top-width:1px;border-left-width:1px}.hud .tr{top:0;right:0;border-top-width:1px;border-right-width:1px}
+.hud .bl{bottom:0;left:0;border-bottom-width:1px;border-left-width:1px}.hud .br{bottom:0;right:0;border-bottom-width:1px;border-right-width:1px}
+.hud .scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.6;top:0;animation:scan 5s linear infinite}
+@keyframes scan{to{top:100%}}
+.rm .hud .scan{display:none}
+.hud .ro{position:absolute;right:0;top:34px;text-align:right;color:var(--mut);line-height:2}
+.hud .ro b{color:var(--ink);font-weight:500}
+.hero .copy{position:absolute;left:3vw;bottom:9vh;max-width:min(900px,92vw)}
+.hero h1{font-size:clamp(48px,7.2vw,124px);line-height:.88}
+.hero h1 span{display:block}
+.hero h1 .comp{font-stretch:62%;font-weight:300;letter-spacing:.02em;color:var(--accent)}
+.hero .row{display:flex;gap:3.5vw;margin:4vh 0 4vh;flex-wrap:wrap}
+.hero .row div b{display:block;font-size:clamp(28px,2.6vw,44px);font-stretch:110%;font-weight:700;line-height:1}
+.hero .row div span{color:var(--mut)}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+
+/* MODES */
+.modes{min-height:100vh;display:grid;grid-template-columns:1fr 1.1fr;gap:5vw;align-items:center;padding:16vh 4vw;position:relative;overflow:hidden}
+.modes .ph{position:absolute;inset:0;z-index:0}
+.modes .ph img{width:100%;height:100%;object-fit:cover;transition:filter .6s;filter:saturate(.35) brightness(.35)}
+.modes .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,12,.96) 30%,rgba(7,9,12,.55))}
+.modes>*{position:relative;z-index:1}
+.modes h2{font-size:clamp(36px,4.2vw,72px);line-height:.92;margin:18px 0 22px}
+.modes p.lead{color:#b9c2ce;max-width:46ch}
+.seg{display:inline-flex;border:1px solid var(--line);margin-top:4vh}
+.seg button{background:none;border:0;color:var(--mut);font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:14px 20px;cursor:pointer;position:relative}
+.seg button[aria-pressed="true"]{color:#fff;background:var(--accent)}
+.panel{border:1px solid var(--line);background:rgba(7,9,12,.6);backdrop-filter:blur(8px);padding:28px}
+.panel canvas{width:100%;height:140px;display:block}
+.bars{margin-top:18px;display:grid;gap:14px}
+.bar{display:grid;grid-template-columns:130px 1fr 44px;align-items:center;gap:14px;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.bar .t{height:4px;background:rgba(238,241,245,.1);position:relative;overflow:hidden}
+.bar .t i{position:absolute;inset:0;transform-origin:0 50%;background:var(--accent);transition:transform .7s cubic-bezier(.2,.8,.2,1),background .4s}
+.bar b{color:var(--ink);text-align:right;font-weight:500}
+.panel .note{margin-top:18px;color:var(--mut);font-size:14px;min-height:3em}
+@media(max-width:900px){.modes{grid-template-columns:1fr}.bar{grid-template-columns:100px 1fr 36px}}
+
+/* HOTSPOTS */
+.hot{height:300vh;position:relative}
+.hot .pin{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+.hot .ttl{position:absolute;top:120px;left:4vw;right:4vw;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;z-index:3}
+.hot .ttl h2{font-size:clamp(32px,3.6vw,60px);line-height:.92}
+.fig{position:relative;width:min(88vw,105vh);aspect-ratio:3/2;margin-top:16vh}
+.fig img{width:100%;height:100%;object-fit:cover;filter:brightness(.9) contrast(1.06);-webkit-mask-image:radial-gradient(52% 54% at 50% 50%,#000 70%,transparent 100%);mask-image:radial-gradient(52% 54% at 50% 50%,#000 70%,transparent 100%)}
+.spot{position:absolute;width:0;height:0;z-index:2;opacity:0}
+.spot .d{position:absolute;left:-9px;top:-9px;width:18px;height:18px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,139,255,.7)}100%{box-shadow:0 0 0 22px rgba(61,139,255,0)}}
+.spot .ln{position:absolute;left:0;top:0;height:1px;background:var(--ink);transform-origin:0 0}
+.spot .lab{position:absolute;width:250px;background:rgba(7,9,12,.85);backdrop-filter:blur(8px);border:1px solid var(--line);padding:14px 16px}
+.spot .lab b{display:block;font-size:15px;font-stretch:115%;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.spot .lab span{color:#b9c2ce;font-size:13.5px;line-height:1.5;display:block}
+.prog{display:flex;gap:6px}.prog i{width:28px;height:3px;background:var(--line)}.prog i.on{background:var(--accent)}
+@media(max-width:800px){.spot .lab{width:180px;padding:10px}.spot .lab span{display:none}}
+
+/* COLORWAY */
+.color{height:360vh;position:relative}
+.color .shade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(7,9,12,.95),transparent 40%),linear-gradient(180deg,rgba(7,9,12,.6),transparent 25%);pointer-events:none}
+.color .ui{position:absolute;left:4vw;right:4vw;bottom:7vh;display:flex;justify-content:space-between;align-items:flex-end;gap:4vw;flex-wrap:wrap}
+.color h2{font-size:clamp(34px,4vw,70px);line-height:.9}
+.color .name{color:#cfd6df;margin-top:12px;min-height:1.6em}
+.sw{display:flex;gap:12px}
+.sw button{width:54px;height:54px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;position:relative;transition:transform .25s;outline-offset:4px}
+.sw button:after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid transparent;transition:border-color .3s}
+.sw button[aria-pressed="true"]:after{border-color:var(--ink)}
+.sw button:hover{transform:scale(1.08)}
+
+/* OFFERS + INVENTORY */
+.offers{padding:16vh 4vw 10vh;border-top:1px solid var(--line)}
+.offers .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:5vh}
+.offers h2{font-size:clamp(34px,4vw,68px);line-height:.9}
+.special{display:grid;grid-template-columns:1.1fr 1fr;border:1px solid var(--line);margin-bottom:4vh;overflow:hidden}
+.special .im{position:relative;min-height:380px}
+.special .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.special .tx{padding:4vh 3vw;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.special .big{font-size:clamp(56px,6vw,104px);line-height:.85;font-stretch:115%;font-weight:800;font-variant-numeric:tabular-nums}
+.special .big small{font-size:.3em;font-weight:500;color:var(--mut);margin-left:6px}
+.special .terms{display:flex;gap:28px;color:var(--mut);flex-wrap:wrap}
+.special .terms b{display:block;color:var(--ink);font-size:20px;font-stretch:110%}
+.disc{font-size:11.5px;line-height:1.55;color:#6f7988;margin-top:10px}
+@media(max-width:900px){.special{grid-template-columns:1fr}.special .im{min-height:240px}}
+.inv{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{border:1px solid var(--line);background:#0b0e13;display:flex;flex-direction:column;transition:border-color .3s,transform .3s}
+.card:hover{border-color:rgba(61,139,255,.6);transform:translateY(-4px)}
+.card .im{aspect-ratio:16/10;overflow:hidden;position:relative}
+.card .im img{width:100%;height:100%;object-fit:cover;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.card:hover .im img{transform:scale(1.05)}
+.card .tag{position:absolute;top:12px;left:12px;background:rgba(7,9,12,.8);padding:6px 9px}
+.card .bd{padding:18px 18px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:18px;font-stretch:112%;font-weight:700;text-transform:uppercase;line-height:1.15}
+.card .sp{color:var(--mut);font-size:13.5px}
+.card .pr{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);margin-top:auto;padding-top:12px}
+.card .pr b{font-size:24px;font-stretch:110%;font-variant-numeric:tabular-nums}
+.card .btn{margin-top:12px;width:100%}
+@media(max-width:900px){.inv{grid-template-columns:1fr}}
+dialog{margin:auto;border:1px solid var(--line);background:#0b0e13;color:var(--ink);padding:28px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+dialog h3{font-size:26px;font-stretch:120%;font-weight:800;text-transform:uppercase}
+dialog label{display:block;font-size:13px;color:var(--mut);margin-top:14px}
+dialog input{width:100%;margin-top:6px;background:#07090c;border:1px solid var(--line);color:var(--ink);padding:12px;font:16px var(--sans)}
+dialog .xx{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--mut);font-size:22px;cursor:pointer}
+dialog .ok{display:none;color:#7bd389;margin-top:14px;font-size:14px}
+footer{padding:10vh 4vw 14vh;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:4vw;color:var(--mut);font-size:13px}
+footer h4{color:var(--ink);font-size:14px;font-stretch:120%;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+footer li{list-style:none;margin:4px 0}footer a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:800px){footer{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="curs"></div>
+<div class="util"><span><b>Halcyon Motor Group</b><span class="hide"> · M Certified concept store</span></span><span class="r"><span class="hide">Sales <a href="tel:5550100199">(555) 010-0199</a></span><span>Concept · fictional dealer</span></span></div>
+<nav class="nav" id="nav"><div class="logo"><span class="stripe" aria-hidden="true"><i></i><i></i><i></i></span>Halcyon M Performance</div><ul><li>New M</li><li>Certified</li><li>Lease specials</li><li>M Service</li></ul><a class="btn" href="#offers" data-cursor>Offers</a></nav>
+
+<header class="hero" id="hero">
+  <div class="stage">
+    <img class="fb" src="../img/cars/m4-dc.webp" alt="Green BMW M4 seen from above crossing a crosswalk">
+    <canvas id="gl1" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="hud" aria-hidden="true"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><i class="scan"></i>
+      <div class="ro mono">S58 · 2,993 cc<br>M xDrive · <b id="drv">4WD</b><br>Track <b id="lap">00:00.000</b></div></div>
+    <div class="copy">
+      <span class="mono"><span class="stripe" aria-hidden="true"><i></i><i></i><i></i></span>&nbsp; New 2026 · In stock</span>
+      <h1 class="x" data-split><span>BMW M4</span><span class="comp">Competition</span></h1>
+      <div class="row" data-reveal>
+        <div><b>523 hp</b><span class="mono">Twin-turbo I6</span></div>
+        <div><b>479 lb-ft</b><span class="mono">Torque</span></div>
+        <div><b>3.4 s</b><span class="mono">0–60 mph, xDrive</span></div>
+      </div>
+      <div class="ctas" data-reveal data-delay=".15"><a class="btn" href="#offers" data-cursor>See lease offer</a><a class="btn ghost" href="#inv" data-cursor>Shop inventory</a></div>
+    </div>
+  </div>
+</header>
+
+<section class="modes" id="modes" aria-labelledby="modesH">
+  <div class="ph" aria-hidden="true"><img id="modeImg" src="../img/cars/m4-cs.webp" alt="" loading="lazy"></div>
+  <div>
+    <span class="mono">01 · Setup</span>
+    <h2 class="x" id="modesH" data-split>Three cars in one.</h2>
+    <p class="lead" data-reveal>The M Setup menu changes how the engine answers, how the dampers hold the body and how much the steering tells you. Pick a mode and watch what changes.</p>
+    <div class="seg" role="group" aria-label="Drive mode" id="seg">
+      <button aria-pressed="true" data-m="0">Comfort</button><button aria-pressed="false" data-m="1">Sport</button><button aria-pressed="false" data-m="2">Sport Plus</button>
+    </div>
+  </div>
+  <div class="panel" data-reveal>
+    <div class="mono" style="display:flex;justify-content:space-between"><span>Exhaust trace (visual)</span><span id="modeName">Comfort</span></div>
+    <canvas id="wave" aria-hidden="true"></canvas>
+    <div class="bars">
+      <div class="bar"><span>Throttle</span><span class="t"><i id="b0"></i></span><b id="v0">1</b></div>
+      <div class="bar"><span>Dampers</span><span class="t"><i id="b1"></i></span><b id="v1">1</b></div>
+      <div class="bar"><span>Steering</span><span class="t"><i id="b2"></i></span><b id="v2">1</b></div>
+      <div class="bar"><span>Shift speed</span><span class="t"><i id="b3"></i></span><b id="v3">1</b></div>
+    </div>
+    <p class="note" id="note" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="hot" id="hot">
+  <div class="pin">
+    <div class="ttl"><div><span class="mono">02 · Hardware</span><h2 class="x" data-split>What the money buys.</h2></div><div class="prog" id="hprog" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
+    <div class="fig" id="fig">
+      <img src="../img/cars/m4-adelaide.webp" alt="Black BMW M4 Competition parked on a city street, front three-quarter view" loading="lazy">
+      <div class="spot" style="left:33%;top:36%" data-lx="-280" data-ly="-120"><i class="d"></i><i class="ln"></i><div class="lab"><b>S58 inline-six</b><span>3.0-litre M TwinPower Turbo. Two mono-scroll turbos, a 7,200 rpm redline.</span></div></div>
+      <div class="spot" style="left:55%;top:15%" data-lx="90" data-ly="-20"><i class="d"></i><i class="ln"></i><div class="lab"><b>Carbon-fibre roof</b><span>Standard on the coupe. Weight comes out of the highest point of the car.</span></div></div>
+      <div class="spot" style="left:61%;top:66%" data-lx="-300" data-ly="80"><i class="d"></i><i class="ln"></i><div class="lab"><b>M Compound brakes</b><span>Six-piston fronts. M Carbon ceramics if you track it hard.</span></div></div>
+      <div class="spot" style="left:92%;top:47%" data-lx="-120" data-ly="70"><i class="d"></i><i class="ln"></i><div class="lab"><b>M xDrive, with a 2WD button</b><span>All-wheel drive for the commute. Rear-wheel drive when you ask for it.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="color" id="color">
+  <div class="stage">
+    <img class="fb" src="../img/cars/m4-dc.webp" alt="BMW M4 colourways">
+    <canvas id="gl2" aria-hidden="true"></canvas>
+    <div class="shade"></div>
+    <div class="ui">
+      <div><span class="mono">03 · Colour</span><h2 class="x" data-split>Choose your weapon.</h2><p class="name mono" id="cname" aria-live="polite">Isle of Man Green · shown</p></div>
+      <div class="sw" role="group" aria-label="Colourway" id="sw">
+        <button aria-pressed="true" data-i="0" data-n="Isle of Man Green · shown" style="background:linear-gradient(135deg,#2f6b55,#0f2a22)" aria-label="Green"></button>
+        <button aria-pressed="false" data-i="1" data-n="São Paulo Yellow · shown" style="background:linear-gradient(135deg,#d7ef5a,#7d8f17)" aria-label="Yellow"></button>
+        <button aria-pressed="false" data-i="2" data-n="Blue · M4 CS shown, IAA 2025" style="background:linear-gradient(135deg,#3150b8,#0d1a4a)" aria-label="Blue"></button>
+        <button aria-pressed="false" data-i="3" data-n="Black · M4 Competition shown" style="background:linear-gradient(135deg,#40444c,#07080a)" aria-label="Black"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="offers" id="offers" aria-labelledby="offH">
+  <div class="hd"><div><span class="mono">04 · This month</span><h2 class="x" id="offH" data-split>Offers &amp; inventory</h2></div><span class="mono" style="color:var(--mut)">Prices updated daily · Illustrative</span></div>
+  <div class="special" data-reveal>
+    <div class="im"><img src="../img/cars/m4-red.webp" alt="Red BMW M4 Competition at a motor show" loading="lazy"></div>
+    <div class="tx">
+      <span class="mono" style="color:var(--accent)">Lease special · 2026 M4 Competition xDrive Coupe</span>
+      <div class="big">$1,199<small>/mo</small></div>
+      <div class="terms"><div><b>36</b>months</div><div><b>$6,999</b>due at signing</div><div><b>10k</b>miles / yr</div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px"><button class="btn" data-lead="Claim this offer">Claim this offer</button><button class="btn ghost" data-lead="Value your trade">Value your trade</button></div>
+      <p class="disc">Illustrative offer on a concept site, not a real offer. On a live store this disclaimer carries the OEM-required language: closed-end lease through the captive lender to well-qualified lessees, excludes tax, title, license and dealer fees, $0.25/mile over the allowance, offer end date, and stock-number eligibility. See dealer for details.</p>
+    </div>
+  </div>
+  <div class="inv" id="inv">
+    <article class="card" data-reveal><div class="im"><img src="../img/cars/m4-front.webp" alt="Yellow BMW M4 Competition side view" loading="lazy"><span class="tag mono">In stock</span></div><div class="bd"><h3>2026 M4 Competition xDrive Coupe</h3><span class="sp">São Paulo Yellow · Black Merino · Stock M26-0141</span><div class="pr"><span class="mono">MSRP</span><b>$93,450</b></div><button class="btn ghost" data-lead="Confirm availability">Confirm availability</button></div></article>
+    <article class="card" data-reveal data-delay=".08"><div class="im"><img src="../img/cars/m4-welt.webp" alt="Blue BMW M4 Competition convertible inside BMW Welt" loading="lazy"><span class="tag mono">In transit</span></div><div class="bd"><h3>2026 M4 Competition xDrive Convertible</h3><span class="sp">Portimao Blue · Kyalami Orange · Stock M26-0177</span><div class="pr"><span class="mono">MSRP</span><b>$101,275</b></div><button class="btn ghost" data-lead="Reserve this vehicle">Reserve</button></div></article>
+    <article class="card" data-reveal data-delay=".16"><div class="im"><img src="../img/cars/m4-dc2.webp" alt="Green BMW M4 Competition on a city street" loading="lazy"><span class="tag mono">Certified</span></div><div class="bd"><h3>2023 M4 Competition xDrive Coupe</h3><span class="sp">12,840 mi · Certified Pre-Owned · Stock C23-0503</span><div class="pr"><span class="mono">Halcyon price</span><b>$72,449</b></div><a class="btn ghost" href="../dealer/vehicle.html?stock=C23-0503" data-cursor>View listing</a></div></article>
+  </div>
+  <p class="disc" style="margin-top:22px">Stock numbers, prices and colours on this page are illustrative. Specifications are BMW’s published figures for the 2025-on M4 Competition xDrive coupe.</p>
+</section>
+
+<dialog id="lead" aria-labelledby="leadH">
+  <button class="xx" aria-label="Close" data-close>×</button>
+  <h3 id="leadH">Confirm availability</h3>
+  <form id="leadF">
+    <label>First name<input name="f" autocomplete="given-name" required></label>
+    <label>Email<input name="e" type="email" autocomplete="email" required></label>
+    <label>Phone<input name="p" type="tel" autocomplete="tel"></label>
+    <button class="btn" style="margin-top:18px;width:100%">Send</button>
+    <p class="ok" id="ok" role="status">Concept form, so nothing was sent. On a live dealer site this posts to the CRM as an ADF/XML lead.</p>
+  </form>
+</dialog>
+
+<footer>
+  <div><h4>Concept</h4><p>Halcyon Motor Group is fictional. Designed and built by Asad Matsumoto to show a dealership model page with a custom WebGL stage, an interactive drive-mode explainer, scroll-revealed hotspots and a colour switcher, sitting on the same lead and pricing components a dealer site needs. Not affiliated with BMW AG or BMW of North America. BMW, M4 and the M logo are trademarks of BMW AG.</p><p style="margin-top:14px"><a href="../" data-cursor>← Back to the discography</a></p></div>
+  <div><h4>Photography (Wikimedia Commons)</h4><ul id="credits"></ul></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="../shared/shared.js"></script>
+<script src="../shared/glfx.js"></script>
+<script>
+(function(){
+  var CREDITS=[["OWS Photography","CC BY 4.0","BMW_M4_(G82)_Washington_DC_Metro_Area,_USA.jpg"],["Alexander Migl","CC BY-SA 4.0","BMW_M4_CS_(G82)_VR46_Edition_IAA_2025_DSC_1308.jpg"],["Pangalau","CC BY-SA 4.0","BMW_M4_(G82)_in_Adelaide,_Australia.jpg"],["LuvsMG481","CC BY-SA 4.0","2021_BMW_M4_Competition_G82_front.jpg"],["OWS Photography","CC BY 4.0","BMW_M4_(G82)_Washington_DC_Metro_Area,_USA_(1).jpg"],["Alexander Migl","CC BY-SA 4.0","BMW_M4_(G82)_Competition_1X7A0305.jpg"],["Strubbl","CC0","BMW_M4_in_der_BMW_Welt.jpg"]];
+  document.getElementById('credits').innerHTML=CREDITS.map(function(c){return '<li><a href="https://commons.wikimedia.org/wiki/File:'+c[2]+'" rel="noopener">'+c[2].replace(/_/g,' ')+'</a> · '+c[0]+' · '+c[1]+'</li>';}).join('');
+  addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('solid',scrollY>innerHeight*.5);},{passive:true});
+
+  // ---- lap timer in the HUD (decorative) ----
+  var lap=document.getElementById('lap'),t0=performance.now();
+  if(!A.rm) setInterval(function(){var t=(performance.now()-t0)/1000%600;lap.textContent=String(Math.floor(t/60)).padStart(2,'0')+':'+(t%60).toFixed(3).padStart(6,'0');},53);
+
+  // ---- drive modes ----
+  var MODES=[
+    {n:'Comfort',c:'#3d8bff',v:[3,2,2,3],amp:.22,f:1.2,j:.05,img:'saturate(.35) brightness(.35)',note:'Soft throttle map, dampers in their most compliant setting, lighter steering. The car you drive to work.'},
+    {n:'Sport',c:'#ff8a1f',v:[7,6,6,7],amp:.5,f:2.1,j:.18,img:'saturate(.8) brightness(.45)',note:'Sharper pedal, firmer body control, flaps open earlier. The back road setting.'},
+    {n:'Sport Plus',c:'#ff2a3d',v:[10,9,8,10],amp:.85,f:3.4,j:.42,img:'saturate(1.15) brightness(.55) contrast(1.15)',note:'Everything at its most direct. Shifts are hardest and quickest. Save it for the track day.'}];
+  var cur=MODES[0],tgt={amp:cur.amp,f:cur.f,j:cur.j},w=document.getElementById('wave'),wx=w.getContext('2d');
+  function setMode(i){cur=MODES[i];document.documentElement.style.setProperty('--accent',cur.c);
+    document.querySelectorAll('#seg button').forEach(function(b,k){b.setAttribute('aria-pressed',k===i?'true':'false')});
+    cur.v.forEach(function(v,k){document.getElementById('b'+k).style.transform='scaleX('+v/10+')';document.getElementById('v'+k).textContent=v;});
+    document.getElementById('modeName').textContent=cur.n;document.getElementById('note').textContent=cur.note;document.getElementById('modeImg').style.filter=cur.img;
+    document.getElementById('drv').textContent=i===2?'4WD Sport':'4WD';}
+  document.querySelectorAll('#seg button').forEach(function(b){b.onclick=function(){setMode(+b.dataset.m)}});
+  setMode(0);
+  var ph=0;(function wave(){requestAnimationFrame(wave);var W=w.width=w.clientWidth*Math.min(devicePixelRatio,2),H=w.height=w.clientHeight*Math.min(devicePixelRatio,2);
+    tgt.amp+=(cur.amp-tgt.amp)*.06;tgt.f+=(cur.f-tgt.f)*.06;tgt.j+=(cur.j-tgt.j)*.06;ph+=A.rm?0:.05*tgt.f;
+    wx.clearRect(0,0,W,H);wx.lineWidth=2*Math.min(devicePixelRatio,2);
+    for(var L=0;L<3;L++){wx.beginPath();wx.strokeStyle=L?'rgba(238,241,245,'+(.14/L)+')':cur.c;
+      for(var x=0;x<=W;x+=3){var u=x/W,env=Math.sin(u*Math.PI);var y=H/2+env*H*.42*tgt.amp*(Math.sin(u*18*tgt.f+ph+L*.6)*.7+Math.sin(u*47+ph*2.3)*tgt.j+Math.sin(u*7-ph*.7)*.3);x?wx.lineTo(x,y):wx.moveTo(x,y);}
+      wx.stroke();}
+  })();
+
+  // ---- lead modal ----
+  var dlg=document.getElementById('lead');
+  document.querySelectorAll('[data-lead]').forEach(function(b){b.onclick=function(){document.getElementById('leadH').textContent=b.dataset.lead;document.getElementById('ok').style.display='none';dlg.showModal();};});
+  dlg.querySelector('[data-close]').onclick=function(){dlg.close();};
+  document.getElementById('leadF').onsubmit=function(e){e.preventDefault();document.getElementById('ok').style.display='block';};
+
+  // ---- hotspot geometry: leader line from dot to label ----
+  document.querySelectorAll('.spot').forEach(function(s){var lx=+s.dataset.lx,ly=+s.dataset.ly,lab=s.querySelector('.lab'),ln=s.querySelector('.ln');
+    lab.style.left=lx+'px';lab.style.top=ly+'px';var ex=lx<0?lx+250:lx,ey=ly+24;var len=Math.hypot(ex,ey),ang=Math.atan2(ey,ex)*180/Math.PI;
+    ln.style.width=len+'px';ln.style.transform='rotate('+ang+'deg) scaleX(0)';ln.dataset.ang=ang;});
+
+  // ---- GL ----
+  var fx1=GLFX(document.getElementById('gl1'),['../img/cars/m4-dc.webp','../img/cars/m4-adelaide.webp'],{edge:[.25,.5,1]});
+  var cols=['../img/cars/m4-dc.webp','../img/cars/m4-front.webp','../img/cars/m4-cs.webp','../img/cars/m4-adelaide.webp'];
+  var fx2=GLFX(document.getElementById('gl2'),cols,{edge:[.3,.55,1]});
+  if(!fx1||!fx2) document.documentElement.classList.add('nogl');
+  var swb=document.querySelectorAll('#sw button');
+  function markSw(i){swb.forEach(function(b,k){b.setAttribute('aria-pressed',k===i?'true':'false')});document.getElementById('cname').textContent=swb[i].dataset.n;}
+
+  A.init(function(gsap,ST,lenis){
+    if(!gsap){ document.querySelectorAll('.spot').forEach(function(s){s.style.opacity=1;s.querySelector('.ln').style.transform='rotate('+s.querySelector('.ln').dataset.ang+'deg)';});
+      swb.forEach(function(b){b.onclick=function(){var i=+b.dataset.i;if(fx2)fx2.show(i);markSw(i);}}); return; }
+    if(fx1){ fx1.s.zm=1.0;
+      gsap.timeline({scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom bottom',scrub:.8}})
+        .to(fx1.s,{zm:1.16,duration:1,ease:'none'},0)
+        .to('.hero .copy',{opacity:0,y:-50,duration:.3},.35)
+        .to(fx1.s,{p:1,ab:1,duration:.45},.55)
+        .to(fx1.s,{zm:1.05,duration:.45},.55); }
+    // hotspots: one by one as you scroll
+    var hs=gsap.utils.toArray('.spot'),bars=document.querySelectorAll('#hprog i');
+    var ht=gsap.timeline({scrollTrigger:{trigger:'#hot',start:'top top',end:'bottom bottom',scrub:.6,onUpdate:function(st){var k=Math.min(3,Math.floor(st.progress*4.2));bars.forEach(function(b,i){b.classList.toggle('on',i<=k)});}}});
+    ht.fromTo('#fig img',{scale:1.12},{scale:1,duration:4,ease:'none'},0);
+    hs.forEach(function(s,i){var ln=s.querySelector('.ln'),ang=ln.dataset.ang;
+      ht.to(s,{opacity:1,duration:.2},i*.95+.1)
+        .fromTo(ln,{transform:'rotate('+ang+'deg) scaleX(0)'},{transform:'rotate('+ang+'deg) scaleX(1)',duration:.3},i*.95+.15)
+        .fromTo(s.querySelector('.lab'),{opacity:0,y:12},{opacity:1,y:0,duration:.3},i*.95+.3);});
+    // colourway: scroll walks through four paints; swatches jump the scroll to that paint
+    var ct={x:0};
+    var cst=ScrollTrigger.create({trigger:'#color',start:'top top',end:'bottom bottom',scrub:.7,animation:gsap.to(ct,{x:3,ease:'none',onUpdate:function(){if(fx2){var i=Math.floor(ct.x),f=ct.x-i;fx2.seq(i+Math.max(0,Math.min(1,(f-.35)/.5)));fx2.s.zm=1.04+f*.06;}markSw(Math.min(3,Math.round(ct.x)));}})});
+    swb.forEach(function(b){b.onclick=function(){var i=+b.dataset.i;lenis.scrollTo(cst.start+(cst.end-cst.start)*(i/3),{duration:1.4});};});
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asad Matsumoto — Web Design &amp; Front-End</title>
+<meta name="description" content="The catalog: dealership websites, cinematic model pages, luxury concepts and shipped client work by Asad Matsumoto. Hand-coded HTML, CSS, JavaScript, jQuery and WebGL.">
+<meta property="og:title" content="Asad Matsumoto — Web Design & Front-End">
+<meta property="og:description" content="Dealership websites, cinematic model pages, luxury concepts and shipped client work. Hand-coded.">
+<meta property="og:image" content="img/shots/zl1.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/shared.css">
+<style>
+:root{--bg:#0b0b0c;--ink:#efede8;--mut:#8b8882;--line:rgba(239,237,232,.12);--accent:#ff5b2e;--serif:'Instrument Serif',Georgia,serif;--sans:'Inter Tight',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--sans)}
+.mono{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{padding:0 4vw}
+.top{position:fixed;z-index:50;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:20px 4vw;mix-blend-mode:difference;color:#fff}
+.top b{font:600 15px var(--sans);letter-spacing:.01em}
+.top nav{display:flex;gap:26px;font:500 13px var(--sans)}
+@media(max-width:700px){.top nav a:not(:last-child){display:none}}
+/* hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 4vw 6vh;position:relative;overflow:hidden}
+.hero h1{font:400 clamp(64px,13.5vw,250px)/.84 var(--serif);letter-spacing:-.025em}
+.hero h1 em{color:var(--accent)}
+.hero .row{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:4vw;margin-top:6vh;border-top:1px solid var(--line);padding-top:3vh}
+.hero .row p{color:#c9c6bf;max-width:44ch}
+.hero .row a{border-bottom:1px solid var(--line)}
+.hero .row a:hover{border-color:var(--accent)}
+.avail{display:inline-flex;align-items:center;gap:10px}
+.avail i{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 0 rgba(61,220,132,.6);animation:pulse 2s infinite}
+@keyframes pulse{to{box-shadow:0 0 0 12px rgba(61,220,132,0)}}
+@media(max-width:800px){.hero .row{grid-template-columns:1fr}}
+.marq{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:16px 0}
+.marq div{display:inline-block;font:400 clamp(28px,3.4vw,52px)/1 var(--serif);animation:mq 38s linear infinite}
+.marq span{margin:0 28px;color:var(--mut)}.marq span.a{color:var(--ink);font-style:italic}
+@keyframes mq{to{transform:translateX(-50%)}}
+.rm .marq div{animation:none}
+/* catalog */
+.cat{padding:16vh 4vw 10vh}
+.cat .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:5vh;flex-wrap:wrap}
+.cat h2{font:400 clamp(48px,7vw,120px)/.9 var(--serif)}
+.cat h2 em{color:var(--accent)}
+.side-note{max-width:36ch;color:var(--mut)}
+.disc{border-top:1px solid var(--line)}
+.disc h3{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:34px 0 10px}
+.trk{display:grid;grid-template-columns:60px 1.5fr 1fr 1.1fr 90px;align-items:center;gap:20px;padding:22px 0;border-bottom:1px solid var(--line);position:relative;transition:padding .4s cubic-bezier(.2,.8,.2,1),color .3s}
+.trk:hover{padding-left:16px}
+.trk .no{font:500 12px var(--mono);color:var(--mut)}
+.trk .t{font:400 clamp(28px,3.2vw,52px)/1 var(--serif)}
+.trk .t small{display:block;font:500 13px var(--sans);color:var(--mut);margin-top:8px;letter-spacing:0}
+.trk .k{font-size:14px;color:#c9c6bf}
+.trk .s{font:500 11px var(--mono);letter-spacing:.06em;color:var(--mut);line-height:1.8}
+.trk .y{font:500 12px var(--mono);color:var(--mut);text-align:right}
+.trk .go{position:absolute;inset:0}
+.trk:after{content:"↗";position:absolute;right:-6px;top:50%;transform:translate(10px,-50%);opacity:0;color:var(--accent);font-size:22px;transition:.3s}
+.trk:hover:after{opacity:1;transform:translate(0,-50%)}
+.trk .thumb{display:none}
+@media(max-width:900px){.trk{grid-template-columns:40px 1fr;gap:10px 14px}.trk .k,.trk .s{grid-column:2}.trk .y{display:none}.trk .thumb{display:block;grid-column:1/-1;aspect-ratio:16/10;overflow:hidden;border-radius:4px}.trk .thumb img{width:100%;height:100%;object-fit:cover}.trk:hover{padding-left:0}}
+.peek{position:fixed;left:0;top:0;width:min(420px,32vw);aspect-ratio:16/10;pointer-events:none;z-index:40;overflow:hidden;border-radius:4px;opacity:0;transform:translate(-50%,-50%) scale(.85);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.peek.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.peek img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(hover:none),(max-width:900px){.peek{display:none}}
+/* ticket log */
+.log{padding:12vh 4vw;border-top:1px solid var(--line)}
+.log h2{font:400 clamp(44px,6vw,100px)/.92 var(--serif);max-width:14ch}
+.log h2 em{color:var(--accent)}
+.log .intro{color:#c9c6bf;max-width:58ch;margin:3vh 0 6vh}
+.tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.tk{background:var(--bg);padding:28px;display:flex;flex-direction:column;gap:14px}
+.tk .id{display:flex;justify-content:space-between}
+.tk h4{font:400 30px/1.05 var(--serif)}
+.tk dl{display:grid;grid-template-columns:70px 1fr;gap:6px 14px;font-size:14.5px;margin:0}
+.tk dt{font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding-top:3px}
+.tk dd{margin:0;color:#d6d3cc}
+.tk dd code{font:400 12.5px var(--mono);color:var(--accent)}
+.tk a.see{margin-top:auto;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid var(--accent);align-self:flex-start;padding-bottom:4px}
+/* about + contact */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:6vw;padding:14vh 4vw;border-top:1px solid var(--line)}
+.about h2{font:400 clamp(40px,5vw,84px)/.95 var(--serif)}
+.about p{color:#c9c6bf;margin-bottom:1.2em;max-width:52ch}
+.about ul{list-style:none;padding:0;margin:0;border-top:1px solid var(--line)}
+.about li{display:flex;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:1px solid var(--line);font-size:15px}
+.about li span{color:var(--mut)}
+@media(max-width:900px){.about{grid-template-columns:1fr}}
+footer{padding:16vh 4vw 8vh;border-top:1px solid var(--line)}
+footer .big{font:400 clamp(56px,11vw,200px)/.86 var(--serif);display:block}
+footer .big em{color:var(--accent)}
+footer .big:hover em{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:10px}
+footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:8vh}
+footer .row a{border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="curs"></div>
+<div class="peek" id="peek" aria-hidden="true"><img id="peekImg" src="img/shots/dealer.webp" alt=""></div>
+<header class="top"><b>Asad Matsumoto</b><nav><a href="#catalog" data-cursor>Catalog</a><a href="#tickets" data-cursor>Ticket log</a><a href="#about" data-cursor>About</a><a href="mailto:matsumoto1f@gmail.com" data-cursor>Email</a></nav></header>
+
+<section class="hero">
+  <span class="mono" data-reveal style="margin-bottom:3vh;display:block">Web design · Front-end · Plainfield, NJ · Remote</span>
+  <h1 data-split>Websites that<br>sell <em>the car.</em></h1>
+  <div class="row">
+    <p data-reveal>I hand-code websites in HTML, CSS, JavaScript and jQuery, from dealership inventory pages to WebGL showrooms. I’ve also spent six years buying the ads that send people to them, so I build for the click that turns into a customer.</p>
+    <p class="mono" data-reveal data-delay=".1" style="line-height:2"><span class="avail"><i></i>Available now</span><br><a href="mailto:matsumoto1f@gmail.com">matsumoto1f@gmail.com</a></p>
+    <p class="mono" data-reveal data-delay=".2" style="line-height:2"><a href="https://www.linkedin.com/in/asad-matsumoto-031102121" rel="noopener">LinkedIn ↗</a><br><a href="https://github.com/matsumoto1f-creator" rel="noopener">GitHub ↗</a><br><a href="https://ket-digital.com" rel="noopener">ket-digital.com ↗</a></p>
+  </div>
+</section>
+
+<div class="marq" aria-hidden="true"><div><span class="a">Dealer websites</span><span>✦</span><span>Price stacks that add up</span><span>✦</span><span class="a">WebGL showrooms</span><span>✦</span><span>jQuery + Bootstrap 3</span><span>✦</span><span class="a">Specials &amp; banners</span><span>✦</span><span>Scroll choreography</span><span>✦</span><span class="a">Dealer websites</span><span>✦</span><span>Price stacks that add up</span><span>✦</span><span class="a">WebGL showrooms</span><span>✦</span><span>jQuery + Bootstrap 3</span><span>✦</span><span class="a">Specials &amp; banners</span><span>✦</span><span>Scroll choreography</span><span>✦</span></div></div>
+
+<section class="cat" id="catalog" aria-labelledby="catH">
+  <div class="hd"><h2 id="catH" data-split>The <em>catalog.</em></h2><p class="side-note" data-reveal>Every piece, in order of what it proves. Concepts are labelled as concepts. The shipped work links to the live site.</p></div>
+
+  <div class="disc">
+    <h3>Side A · Automotive</h3>
+    <div class="trk" data-peek="img/shots/dealer.webp"><span class="no">01</span><span class="t">Halcyon Chevrolet<small>Dealership website · concept</small></span><span class="k">Homepage, inventory search, vehicle detail, specials. Price stacks computed from one data file so the totals always add up.</span><span class="s">HTML5 · CSS3<br>jQuery 3.7 · Bootstrap 3.4</span><span class="y">2026</span><span class="thumb"><img src="img/shots/dealer.webp" alt="" loading="lazy"></span><a class="go" href="dealer/" aria-label="Open Halcyon Chevrolet dealership website" data-cursor></a></div>
+    <div class="trk" data-peek="img/shots/zl1.webp"><span class="no">02</span><span class="t">Camaro ZL1<small>Model showcase + listing · concept</small></span><span class="k">Garage lights flicker on at load, a tach that redlines as you scroll, a custom WebGL dissolve, and a real listing block underneath.</span><span class="s">WebGL (custom shader)<br>GSAP · vanilla JS</span><span class="y">2026</span><span class="thumb"><img src="img/shots/zl1.webp" alt="" loading="lazy"></span><a class="go" href="zl1/" aria-label="Open Camaro ZL1 page" data-cursor></a></div>
+    <div class="trk" data-peek="img/shots/m4.webp"><span class="no">03</span><span class="t">BMW M4 Competition<small>Model showcase + offers · concept</small></span><span class="k">An HUD hero, a drive-mode selector that re-themes the page, hotspots revealed on scroll, a colourway switcher, and a lease offer with full disclaimer.</span><span class="s">WebGL · Canvas 2D<br>GSAP · vanilla JS</span><span class="y">2026</span><span class="thumb"><img src="img/shots/m4.webp" alt="" loading="lazy"></span><a class="go" href="m4/" aria-label="Open BMW M4 Competition page" data-cursor></a></div>
+    <div class="trk" data-peek="img/shots/specials.webp"><span class="no">04</span><span class="t">Specials &amp; coupons<small>Offer pages · concept</small></span><span class="k">Lease, cash and APR offers with complete terms, “View Inventory (n)” counted live from inventory, service coupons, FAQ with matching schema.</span><span class="s">jQuery · Bootstrap tabs<br>FAQPage JSON-LD</span><span class="y">2026</span><span class="thumb"><img src="img/shots/specials.webp" alt="" loading="lazy"></span><a class="go" href="dealer/specials.html" aria-label="Open specials page" data-cursor></a></div>
+
+    <h3>Side B · Luxury</h3>
+    <div class="trk" data-peek="img/shots/maison.webp"><span class="no">05</span><span class="t">Maison Vanta<small>Fashion house · concept</small></span><span class="k">Curtain intro, an SVG-lit silk surface, a pinned four-look lookbook, a clip-path portal and a horizontal runway.</span><span class="s">GSAP ScrollTrigger<br>Lenis · SVG filters</span><span class="y">2026</span><span class="thumb"><img src="img/shots/maison.webp" alt="" loading="lazy"></span><a class="go" href="maison/" aria-label="Open Maison Vanta" data-cursor></a></div>
+    <div class="trk" data-peek="img/shots/aurelia.webp"><span class="no">06</span><span class="t">Aurélia<small>High jewellery · concept</small></span><span class="k">A faceted diamond rendered live in WebGL is cut, turned and set as you scroll.</span><span class="s">Three.js · PBR<br>GSAP · Canvas</span><span class="y">2026</span><span class="thumb"><img src="img/shots/aurelia.webp" alt="" loading="lazy"></span><a class="go" href="aurelia/" aria-label="Open Aurélia" data-cursor></a></div>
+
+    <h3>Side C · Shipped</h3>
+    <div class="trk" data-peek="img/shots/ket.webp"><span class="no">07</span><span class="t">ket-digital.com<small>My company site · live</small></span><span class="k">One background design rendered on WebGPU with a WebGL2 fallback and a still for reduced motion. A scripted pre-flight check blocks any deploy that would break the site.</span><span class="s">HTML · CSS · JS<br>WebGPU · WebGL2 · Netlify</span><span class="y">2024–</span><span class="thumb"><img src="img/shots/ket.webp" alt="" loading="lazy"></span><a class="go" href="https://ket-digital.com" rel="noopener" aria-label="Open ket-digital.com" data-cursor></a></div>
+    <div class="trk" data-peek="img/shots/mercury.webp"><span class="no">08</span><span class="t">Project Mercury<small>Long-form product page · live</small></span><span class="k">A UX audit cut it from 21.9 screens to 20.1, added a jump menu built from the page’s own captions, and replaced a dead calculator state with real numbers on arrival.</span><span class="s">Vanilla JS<br>FAQ schema · analytics</span><span class="y">2026</span><span class="thumb"><img src="img/shots/mercury.webp" alt="" loading="lazy"></span><a class="go" href="https://ket-digital.com/project-mercury" rel="noopener" aria-label="Open Project Mercury" data-cursor></a></div>
+  </div>
+</section>
+
+<section class="log" id="tickets" aria-labelledby="tkH">
+  <h2 id="tkH" data-split>The ticket <em>log.</em></h2>
+  <p class="intro" data-reveal>Most dealer-site work is a queue of client requests: swap a banner, fix a price, build a specials page by Friday. Below are five requests I took from real problems on live dealer sites, and the fix I built for each in the Halcyon demo.</p>
+  <div class="tickets">
+    <article class="tk" data-reveal><div class="id mono"><span>HC-101</span><span>Banner</span></div><h4>A Labor Day banner still running in October</h4><dl><dt>Request</dt><dd>Seasonal slides and promo strips outlive their offers.</dd><dt>Shipped</dt><dd>The promo strip carries <code>data-expires</code>, and jQuery removes it the day after the offer ends. No ticket needed.</dd></dl><a class="see" href="dealer/" data-cursor>See the strip</a></article>
+    <article class="tk" data-reveal data-delay=".05"><div class="id mono"><span>HC-102</span><span>Pricing</span></div><h4>A price stack that doesn’t add up</h4><dl><dt>Request</dt><dd>MSRP, discount, rebate and doc fee typed by hand, so the total drifts.</dd><dt>Shipped</dt><dd>Every line comes from one inventory record and the total is computed. Each line has an (i) disclaimer in one shared modal.</dd></dl><a class="see" href="dealer/vehicle.html?stock=HC26-1142" data-cursor>See a stack</a></article>
+    <article class="tk" data-reveal data-delay=".1"><div class="id mono"><span>HC-103</span><span>Specials</span></div><h4>“View Inventory (7)” when there are two</h4><dl><dt>Request</dt><dd>Offer pages hard-code counts and headlines that go stale.</dd><dt>Shipped</dt><dd>The specials page counts matching stock from the same data the SRP uses, and computes “$4,700 off” from the unit’s own lines.</dd></dl><a class="see" href="dealer/specials.html" data-cursor>See specials</a></article>
+    <article class="tk" data-reveal data-delay=".15"><div class="id mono"><span>HC-104</span><span>Mobile</span></div><h4>A 1920×600 slide that crops the car on phones</h4><dl><dt>Request</dt><dd>Text baked into the art, and the car cut off below 768px.</dd><dt>Shipped</dt><dd>Real HTML text over the slide, a <code>&lt;picture&gt;</code> source for phones, a reflowed caption, and a pause button for the carousel.</dd></dl><a class="see" href="dealer/" data-cursor>See the hero</a></article>
+    <article class="tk" data-reveal data-delay=".2"><div class="id mono"><span>HC-105</span><span>Access</span></div><h4>Images without alt text, a raw template key as a heading</h4><dl><dt>Request</dt><dd>Accessibility left to an overlay widget.</dd><dt>Shipped</dt><dd>Alt text on every image, one H1 per page, real buttons, visible focus rings, keyboard-operable menus and gallery, reduced-motion support.</dd></dl><a class="see" href="dealer/inventory.html" data-cursor>Tab through it</a></article>
+  </div>
+</section>
+
+<section class="about" id="about" aria-labelledby="abH">
+  <div><span class="mono">About</span><h2 id="abH" data-split>Designer who reads the numbers.</h2></div>
+  <div data-reveal>
+    <p>I run KetDigital, where I build the websites and systems small businesses run on. Before and alongside that, I’ve bought Meta and TikTok ads since 2020, working directly with owners on what the money should return. That second job is why my pages are built around the person about to call, click or fill in the form.</p>
+    <p>I hand-code. HTML and CSS first, JavaScript and jQuery where the page needs to do something, and WebGL when the brand can carry it. Every concept here says it’s a concept. The photography is licensed from Wikimedia Commons and credited on each page.</p>
+    <ul><li>Markup &amp; style<span>HTML5 · CSS3 · responsive · Bootstrap 3</span></li><li>Script<span>JavaScript · jQuery · GSAP</span></li><li>3D &amp; motion<span>WebGL · Three.js · Canvas</span></li><li>Marketing<span>Meta · TikTok · conversion</span></li></ul>
+  </div>
+</section>
+
+<footer>
+  <a class="big" href="mailto:matsumoto1f@gmail.com" data-cursor>Let’s build the <em>next one.</em></a>
+  <div class="row mono"><span>© 2026 Asad Matsumoto</span><a href="https://www.linkedin.com/in/asad-matsumoto-031102121" rel="noopener">LinkedIn</a><a href="https://github.com/matsumoto1f-creator" rel="noopener">GitHub</a></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="shared/shared.js"></script>
+<script>
+(function(){
+  // cursor-following preview of each catalog entry
+  var pk=document.getElementById('peek'),pi=document.getElementById('peekImg'),x=0,y=0,tx=0,ty=0,raf;
+  function loop(){x+=(tx-x)*.14;y+=(ty-y)*.14;pk.style.left=x+'px';pk.style.top=y+'px';raf=requestAnimationFrame(loop);}
+  document.querySelectorAll('.trk').forEach(function(t){
+    t.addEventListener('pointerenter',function(e){pi.src=t.dataset.peek;pk.classList.add('on');tx=x=e.clientX+180;ty=y=e.clientY;if(!raf)loop();});
+    t.addEventListener('pointermove',function(e){tx=e.clientX+180;ty=e.clientY;});
+    t.addEventListener('pointerleave',function(){pk.classList.remove('on');});
+  });
+  A.init();
+})();
+</script>
+</body>
+</html>

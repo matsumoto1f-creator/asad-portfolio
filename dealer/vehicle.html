@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vehicle Details · Halcyon Chevrolet (Concept)</title>
+<meta name="description" content="Concept VDP: gallery, price stack with disclaimers, conditional offers, finance and lease calculators, lead forms.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="dealer.css">
+</head>
+<body data-page="vdp">
+<main id="main">
+<div class="container">
+  <div class="crumbs"><a href="index.html">Home</a> / <a href="inventory.html">Inventory</a> / <span id="crumbV"></span></div>
+  <div class="vdp-t"><span class="eyebrow" id="vCond"></span> <span id="vBadges"></span><h1 id="vTitle"></h1><div class="text-muted small" id="vIds"></div></div>
+  <div class="row" style="margin-top:16px">
+    <div class="col-md-7">
+      <div class="gal" tabindex="0" aria-label="Photo gallery, use arrow keys"><div class="main"><img id="gMain" src="" alt=""><button class="nb p" type="button" aria-label="Previous photo">‹</button><button class="nb n" type="button" aria-label="Next photo">›</button><span class="cnt" id="gCnt"></span></div>
+      <p class="note" id="gNote"></p><div class="thumbs" id="thumbs"></div></div>
+      <div id="vLanding"></div>
+      <section class="vdp-sec" style="margin-top:20px"><h2>Highlighted features</h2><div class="feats" id="vFeats"></div><p class="fine-print">Feature availability subject to final vehicle configuration. Refer to the window sticker.</p></section>
+      <section class="vdp-sec"><h2>Vehicle information</h2><table class="spec-t"><tbody id="vSpec"></tbody></table></section>
+      <section class="vdp-sec"><h2>Dealer comments</h2><p id="vComments"></p></section>
+      <section class="vdp-sec"><h2>Warranty</h2><p>New Chevrolet vehicles include the factory bumper-to-bumper and powertrain limited warranties. Certified Pre-Owned vehicles add the remaining factory coverage plus certified powertrain coverage. Ask us for the terms on this exact vehicle.</p></section>
+    </div>
+    <div class="col-md-5"><div class="side"><div class="box">
+      <div id="vStack"></div><div class="fin" id="vFin"></div>
+      <div class="stack-btns"><button class="btn btn-cta btn-lg" data-lead="Confirm availability" data-stock-fill>Confirm Availability</button>
+        <div class="row2"><button class="btn btn-line" data-lead="Get ePrice" data-stock-fill>Get ePrice</button><button class="btn btn-line" data-lead="Value your trade" data-stock-fill>Value Your Trade</button></div>
+        <div class="row2"><button class="btn btn-line" data-lead="Schedule a test drive" data-stock-fill>Test Drive</button><button class="btn btn-line" data-lead="Request the window sticker" data-stock-fill>Window Sticker</button></div></div>
+      <p class="fine-print">Prices exclude tax, title, license and registration. Incentives expire 11/02/2026. See dealer for complete details.</p></div>
+      <div class="calc" id="calc"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#calcFin" role="tab" data-toggle="tab" aria-controls="calcFin">Finance</a></li><li role="presentation"><a href="#calcLease" role="tab" data-toggle="tab" aria-controls="calcLease">Lease</a></li></ul>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="calcFin"><div class="row"><div class="col-xs-6"><label for="cPrice">Vehicle price</label><input class="form-control" id="cPrice" inputmode="numeric"></div><div class="col-xs-6"><label for="cApr">APR %</label><input class="form-control" id="cApr" inputmode="decimal" value="6.9"></div><div class="col-xs-6"><label for="cDown">Down payment</label><input class="form-control" id="cDown" inputmode="numeric" value="5000"></div><div class="col-xs-6"><label for="cTrade">Trade value</label><input class="form-control" id="cTrade" inputmode="numeric" value="0"></div></div>
+            <label>Term (months)</label><div class="terms" role="group" aria-label="Term"><button type="button" data-m="36" aria-pressed="false">36</button><button type="button" data-m="48" aria-pressed="false">48</button><button type="button" data-m="60" aria-pressed="false">60</button><button type="button" data-m="72" aria-pressed="true">72</button><button type="button" data-m="84" aria-pressed="false">84</button></div>
+            <div class="out"><span>Est. monthly<br><small class="text-muted">Amount financed <span id="cAmt"></span></small></span><b id="cOut" aria-live="polite"></b></div><p class="fine">Estimate only, not an offer of credit. Tax, title, license and registration extra. Actual APR depends on credit approval.</p></div>
+          <div role="tabpanel" class="tab-pane" id="calcLease"><div class="row"><div class="col-xs-6"><label for="lTerm">Term</label><select class="form-control" id="lTerm"><option>24</option><option selected>36</option><option>39</option></select></div><div class="col-xs-6"><label for="lDown">Due at signing (cap reduction)</label><input class="form-control" id="lDown" inputmode="numeric" value="3000"></div><div class="col-xs-6"><label for="lRes">Residual %</label><input class="form-control" id="lRes" inputmode="numeric" value="58"></div><div class="col-xs-6"><label for="lMf">Money factor</label><input class="form-control" id="lMf" inputmode="decimal" value="0.00250"></div></div>
+            <div class="out"><span>Est. monthly lease</span><b id="lOut" aria-live="polite"></b></div><p class="fine">Estimate before tax. Residual and money factor are set by the lender; 10k miles/yr assumed. Not an offer.</p></div>
+        </div></div>
+    </div></div>
+  </div>
+  <section class="vdp-sec"><h2>Similar vehicles</h2><div class="grid-cards" id="similar"></div></section>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="inventory.js"></script>
+<script src="dealer.js"></script>
+</body>
+</html>
