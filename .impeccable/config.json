@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "dealer/dealer.css"
+        ],
+        "createdAt": "2026-10-19T02:10:57.943Z",
+        "reason": "Claude: false positive, both flagged rules are square underline tabs (.qs .nav-tabs>li>a sets border-radius:0; .sp-tabs button has no radius)"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-19T02:10:57.980Z",
+        "reason": "Claude: false positive, regex fallback skips clamp() sizes; real scale runs 11px mono to clamp(64px,13.5vw,250px) display"
+      }
+    ]
+  }
+}
